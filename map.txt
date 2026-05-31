@@ -1,0 +1,117 @@
+The Mystery of Silver Mountain - Initial Room Map
+Generated from silverm.bas room numbering and initial exit DATA.
+
+Legend: [nn] room number. -- is E/W. | is N/S. ^ marks U to the row above; v marks D to the row below.
+Conditional exits and changed exits are listed after the map.
+
+[01]--[02]--[03]--[04]--[05]--[06]--[07]--[08]--[09]--[10]
+       |                       |     |     |           |
+[11]  [12]  [13]--[14]  [15]  [16]  [17]  [18]  [19]--[20]
+ |           |     |     |                       |     |
+[21]  [22]--[23]  [24]  [25]--[26]--[27]  [28]  [29]  [30]
+ |           |           |                 |     |
+[31]--[32]  [33]  [34]  [35]--[36]  [37]--[38]  [39]  [40]
+ |           |     v     ^     |                 |     |
+[41]  [42]--[43]--[44]  [45]  [46]  [47]--[48]  [49]--[50]
+ |           |           v     |           |     |
+[51]--[52]--[53]  [54]--[55]  [56]  [57]--[58]--[59]  [60]
+             |                 |                       |
+[61]--[62]  [63]--[64]--[65]  [66]--[67]--[68]--[69]  [70]
+ |     |     |           |                 |     |     v
+[71]  [72]--[73]--[74]--[75]--[76]--[77]--[78]--[79]--[80]
+
+Room key:
+01: HALF-DUG GRAVE    exits: E
+02: GOBLIN GRAVEYARD    exits: ESW
+03: HALLOW TOMB    exits: WE
+04: STALACTITES AND STALAGMITES    exits: EW
+05: MAZE OF TUNNELS    exits: EW
+06: VALUTED CAVERN    exits: ESW
+07: HIGH GLASS GATES    exits: ESW
+08: ENTRANCE HALL TO THE PALACE    exits: ES
+09: GRARG SENTRY POST    exits: EW
+10: GUARD ROOM    exits: SW
+11: MARSHY INLET    exits: S
+12: RUSTY GATES    exits: N
+13: GAMEKEEPER'S COTTAGE    exits: ES
+14: MISTY POOL    exits: SW
+15: HIGH-WALLED GARDEN    exits: S
+16: INSCRIBED CAVERN    exits: NW
+17: ORNATE FOUNTAIN    exits: N
+18: DANK CORRIDOR    exits: N
+19: LONG GALLERY    exits: ES
+20: KITCHENS OF THE PALACE    exits: NSW
+21: OLD KILN    exits: NS
+22: OVERGROWN TRACK    exits: E
+23: DISUSED WATERWHEEL    exits: NSW
+24: SLUICE GATES    exits: N
+25: GAP BETWEEN SOME BOULDERS    exits: NES
+26: PERILOUS PATH    exits: EW
+27: SILVER BELL IN THE ROCK    exits: W
+28: DUNGEONS OF THE PALACE    exits: S
+29: BANQUETING HALL    exits: NS
+30: PALACE BATTLEMENTS    exits: N
+31: ISLAND SHORE    exits: NES
+32: BEACHED KETCH    exits: W
+33: BARREN COUNTRYSIDE    exits: NS
+34: SACKS ON THE UPPER FLOOR    exits: D
+35: FROZEN POND    exits: NES
+36: MOUNTAIN HUT    exits: SW
+37: ROW OF CASKS    exits: E
+38: WINE CELLAR    exits: NW
+39: HALL OF TAPESTRIES    exits: NS
+40: DUSTY LIBRARY    exits: S
+41: ROUGH WATER    exits: NS
+42: PLOUGHED FIELD    exits: E
+43: OUTSIDE A WINDMILL    exits: NSEW
+44: LOWER FLOOR OF THE MILL    exits: WU
+45: ICY PATH    exits: UD
+46: SCREE SLOPE    exits: NS
+47: SILVER CHAMBER    exits: E
+48: WIZARD'S LAIR    exits: SW
+49: MOSAIC-FLOORED HALL    exits: NSE
+50: SILVER THRONE ROOM    exits: NW
+51: MIDDLE OF THE LAKE    exits: NE
+52: EDGE OF AN ICY LAKE    exits: EW
+53: PITTED TRACK    exits: NSW
+54: HIGH PINNACLE    exits: E
+55: ABOVE A GLACIER    exits: WN
+56: HUGE FALLEN OAK    exits: S
+57: TURRET ROOM WITH A SLOT MACHINE    exits: E
+58: COBWEBBY ROOM    exits: NEW
+59: SAFE IN OGBAN'S CHAMBER    exits: NW
+60: CUPBOARD IN A CORNER    exits: S
+61: NARROW PASSAGE    exits: ES
+62: CAVE    exits: SW
+63: WOODMAN'S HUT    exits: NES
+64: SIDE OF A WOODED VALLEY    exits: EW
+65: STREAM IN A VALLEY BOTTOM    exits: SW
+66: DEEP DARK WOOD    exits: NE
+67: SHADY HOLLOW    exits: EW
+68: ANCIENT STONE CIRCLE    exits: ESW
+69: STABLE    exits: SW
+70: ATTIC BEDROOM    exits: ND
+71: DAMP WELL BOTTOM    exits:  
+72: TOP OF A DEEP WELL    exits: E
+73: BURNT-OUT CAMPFIRE    exits: NEW
+74: ORCHARD    exits: EW
+75: END OF A BRIDGE    exits: NEW
+76: END OF A BRIDGE    exits: EW
+77: CROSSROADS    exits: EW
+78: WINDING ROAD    exits: NEW
+79: VILLAGE OF RUSTIC HOUSES    exits: NEW
+80: WHITE COTTAGE    exits: WU
+
+Important conditional or special movement:
+- Rooms 05 east/west enter the randomized maze routine before movement can complete.
+- 03 east and 04 west are blocked by rubble until MOVE RUBBLE at room 04.
+- 04 west remains too steep even after the rubble is revealed.
+- 07 east is blocked by the hound until it is distracted.
+- 18/28 door connection changes from N-only/S-only to NS after breaking the oak door.
+- 27 east-west passage opens after ringing the bell the correct number of times.
+- 37 west can become a steep passage to room 67 after opening/moving the relevant obstruction.
+- 48 west is locked until the door is unlocked with the key.
+- 49 east requires the horseshoe, shield, and ring; south is fatal until Ogban is dead.
+- 52/31 lake movement depends on the boat and sail/power state.
+- 56 is guarded by the ghost until freed by playing the reeds.
+- 75 east and 76 west require paying/giving a coin to the troll immediately before crossing.
