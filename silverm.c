@@ -149,19 +149,6 @@ static void append_response(Game *g, const char *a, const char *b) {
     snprintf(g->response, sizeof(g->response), "%s%s", a, b);
 }
 
-static void decode_rot1(char *s) {
-    for (size_t i = 0; s[i]; i++) {
-        if (s[i] >= 'A' && s[i] <= 'Z') {
-            s[i] = (s[i] == 'A') ? 'Z' : (char)(s[i] - 1);
-        }
-    }
-}
-
-static void set_encoded_response(Game *g, const char *s) {
-    set_response(g, s);
-    decode_rot1(g->response);
-}
-
 static void title(void) {
     putchar('\n');
     puts("MYSTERY OF SILVER");
@@ -494,7 +481,7 @@ static void do_move_direction(Game *g) {
     if (d == 6) d = 3;
     if (!(((g->room == 75 && d == 2) || (g->room == 76 && d == 4))) || flagv[64] == 1) {
     } else {
-        set_encoded_response(g, "B USPMM TUPQT ZPV DSPTTJOH");
+        set_response(g, "A TROLL STOPS YOU CROSSING");
         return;
     }
     if (flagv[64] == 1) flagv[64] = 0;
@@ -527,7 +514,7 @@ static void do_move_direction(Game *g) {
         return;
     }
     if (g->room == 41 && d == 3 && flagv[31] == 0) {
-        set_encoded_response(g, "UIF CPBU JT TJOLJOH!");
+        set_response(g, "THE BOAT IS SINKING!");
         return;
     }
     if (g->room == 33 && d == 1 && flagv[32] == 0) {
@@ -555,7 +542,7 @@ static void do_move_direction(Game *g) {
         return;
     }
     if ((g->room == 38 || g->room == 37) && flagv[50] == 0) {
-        set_encoded_response(g, "JU JT UPP EBSL");
+        set_response(g, "IT IS TOO DARK");
         return;
     }
     if (g->room == 49 && d == 2 && flagv[54] == 0) {
@@ -603,7 +590,7 @@ static void do_move_direction(Game *g) {
     if ((old == 75 && d == 2) || (old == 76 && d == 4)) set_response(g, "OK. YOU CROSSED");
     if (flagv[29] == 1) flagv[39]++;
     if (flagv[39] > 5 && flagv[29] == 1) {
-        set_encoded_response(g, "CPPUT IBWF XPSO PVU");
+        set_response(g, "BOOTS HAVE WORN OUT");
         flagv[29] = 0;
         loc[3] = GONE;
     }
@@ -685,17 +672,17 @@ static void do_examine(Game *g) {
     if (h == 8076) set_response(g, "IT IS EMPTY");
     if (h == 8080) { set_response(g, "AHA!"); flagv[1] = 0; }
     if (h == 7029) { set_response(g, "OK"); flagv[2] = 0; }
-    if (g->noun == 20) { set_encoded_response(g, "NBUDIFT JO QPDLFU"); loc[26] = INVENTORY; }
+    if (g->noun == 20) { set_response(g, "MATCHES IN POCKET"); loc[26] = INVENTORY; }
     if (h == 1648) snprintf(g->response, sizeof(g->response), "THERE ARE SOME LETTERS '%s'", maze_path[1]);
-    if (h == 7432) { set_encoded_response(g, "UIFZ BSF BQQMF USFFT"); flagv[5] = 0; }
+    if (h == 7432) { set_response(g, "THEY ARE APPLE TREES"); flagv[5] = 0; }
     if (h == 2134 || h == 2187) { set_response(g, "OK"); flagv[16] = 0; }
     if (g->noun == 35) { set_response(g, "IT IS FISHY!"); flagv[17] = 0; }
     if (h == 3438) { set_response(g, "OK"); flagv[22] = 0; }
     if (h == 242) set_response(g, "A FADED INSCRIPTION");
-    if ((h == 1443 || h == 1485) && flagv[33] == 0) set_encoded_response(g, "B HMJNNFSJOH GSPN UIF EFQUIT");
+    if ((h == 1443 || h == 1485) && flagv[33] == 0) set_response(g, "A GLIMMERING FROM THE DEPTHS");
     if ((h == 1443 || h == 1485) && flagv[33] == 1) { set_response(g, "SOMETHING HERE..."); flagv[12] = 0; }
     if (h == 2479 || h == 2444) set_response(g, "THERE IS A HANDLE");
-    if (g->noun == 9) set_encoded_response(g, "UIF MBCFM SFBET 'QPJTPO'");
+    if (g->noun == 9) set_response(g, "THE LABEL READS 'POISON'");
     if (h == 4055) {
         int r = flagv[flagv[52] + 57];
         snprintf(g->response, sizeof(g->response), "MAGIC WORDS LIE AT THE CROSSROADS, THE FOUNTAIN AND THE %s", rooms[r].name);
@@ -708,7 +695,7 @@ static void do_examine(Game *g) {
     if (h == 6970) { set_response(g, "YOU FOUND SOMETHING"); flagv[4] = 0; }
     if (h == 2066) set_response(g, "A LARGE CUPBOARD IN THE CORNER");
     if (h == 6865 || h == 6853) set_response(g, "THERE ARE NINE STONES");
-    if (h == 248) set_encoded_response(g, "B GBEFE XPSE - 'N S I T'");
+    if (h == 248) set_response(g, "A FADED WORD - 'M R H S'");
 }
 
 static void do_give(Game *g) {
@@ -761,12 +748,12 @@ static void do_wear(Game *g) {
     if (g->noun == 3) {
         flagv[29] = 1;
         flagv[55] = 0;
-        set_encoded_response(g, "ZPV BSF JOWJTJCMF");
+        set_response(g, "YOU ARE INVISIBLE");
     }
     if (g->noun == 20) {
         flagv[51] = 1;
         flagv[55] = 0;
-        set_encoded_response(g, "ZPV BSF EJTHVJTFE");
+        set_response(g, "YOU ARE DISGUISED");
     }
 }
 
@@ -797,7 +784,7 @@ static void do_use(Game *g) {
     int h = hcode(g);
     if (h == 522) { set_response(g, "OK"); flagv[30] = 1; }
     if (g->noun == 1 || g->noun == 62 || g->noun == 5 || g->noun == 28 || g->noun == 11 || g->noun == 24) do_give(g);
-    if (h == 416) { set_encoded_response(g, "ZPV IBWF LFQU BGMPBU"); flagv[31] = 1; return; }
+    if (h == 416) { set_response(g, "YOU HAVE KEPT AFLOAT"); flagv[31] = 1; return; }
     if (h == 4116) { set_response(g, "IT IS NOT BIG ENOUGH!"); return; }
     if (g->noun == 18 || g->noun == 7) do_break(g);
     if (g->noun == 13) do_drop(g);
@@ -815,7 +802,7 @@ static void do_open(Game *g) {
     if (h == 3756) { set_response(g, "A PASSAGE!"); strcpy(exits[37], "EW"); }
     if (h == 5960) {
         char input[64];
-        set_encoded_response(g, "XIBU JT UIF DPEF");
+        set_response(g, "WHAT IS THE CODE");
         puts(g->response);
         if (fgets(input, sizeof(input), stdin) && atoi(input) == flagv[41]) {
             set_response(g, "IT OPENS");
@@ -833,7 +820,7 @@ static void do_light(Game *g) {
     if (g->noun > CARRIED_OBJECTS) set_response(g, "IT DOES NOT BURN");
     if (g->noun == 26) set_response(g, "YOU LIT THEM");
     if (h == 3826) set_response(g, "NOT BRIGHT ENOUGH");
-    if ((g->noun == 23 || h == 6970) && loc[26] != INVENTORY) set_encoded_response(g, "OP NBUDIFT");
+    if ((g->noun == 23 || h == 6970) && loc[26] != INVENTORY) set_response(g, "NO MATCHES");
     if (g->noun == 23 && loc[26] == INVENTORY) { snprintf(g->response, sizeof(g->response), "A BRIGHT %s", g->verb_text); flagv[50] = 1; }
     if (h == 6970 && loc[26] == INVENTORY) { flagv[43] = 1; set_response(g, "IT HAS TURNED TO ASHES"); }
 }
@@ -859,7 +846,7 @@ static void do_plant(Game *g) {
 
 static void do_water(Game *g) {
     if (g->noun == 22 && flagv[37] == 1 && flagv[34] == 1) {
-        set_encoded_response(g, "B MBSHF WJOF HSPXT JO TFDPOET!");
+        set_response(g, "A LARGE VINE GROWS IN SECONDS!");
         flagv[38] = 1;
     }
 }
@@ -895,7 +882,7 @@ static void do_rig(Game *g) {
 static void do_turn(Game *g) {
     int h = hcode(g);
     if (h == 2340) set_response(g, "IT GOES ROUND");
-    if (h == 2445) { set_encoded_response(g, "UIF HBUFT PQFO, UIF QPPM FNQUJFT"); flagv[33] = 1; }
+    if (h == 2445) { set_response(g, "THE GATES OPEN, THE POOL EMPTIES"); flagv[33] = 1; }
 }
 
 static void do_dive(Game *g) {
@@ -935,14 +922,14 @@ static void do_throw(Game *g) {
     set_response(g, "DID NOT GO FAR!");
     loc[g->noun] = g->room;
     if (h == 3317) {
-        set_encoded_response(g, "ZPV DBVHIU UIF CPBS");
+        set_response(g, "YOU CAUGHT THE BOAR");
         flagv[32] = 1;
     }
 }
 
 static void do_blow(Game *g) {
     int h = hcode(g);
-    if (g->noun == 10) set_encoded_response(g, "B OJDF UVOF");
+    if (g->noun == 10) set_response(g, "A NICE TUNE");
     if (h == 5233) set_response(g, "WHAT WITH?");
     if (g->noun == 83) set_response(g, "HOW, O MUSICAL ONE?");
     if (h == 5610) { flagv[35] = 1; set_response(g, "THE GHOST OF THE GOBLIN GUARDIAN IS FREE!"); strcpy(exits[56], "NS"); }
@@ -982,7 +969,7 @@ static void do_ring(Game *g) {
         strcpy(exits[27], "EW");
         return;
     }
-    set_encoded_response(g, "ZPV IBWF NJTUSFBUFE UIF CFMM!");
+    set_response(g, "YOU HAVE MISTREATED THE BELL!");
     flagv[56] = 1;
 }
 
@@ -996,7 +983,7 @@ static void do_cut(Game *g) {
 static void do_reflect(Game *g) {
     int h = hcode(g);
     if ((h == 4864 || h == 4819) && loc[19] == INVENTORY) {
-        set_encoded_response(g, "ZPV SFGMFDUFE UIF XJABSET HMBSF! IF JT EFBE");
+        set_response(g, "YOU REFLECTED THE WIZARDS GLARE! HE IS DEAD");
         flagv[63] = 1;
     }
     if (g->noun == 27) do_get(g);
