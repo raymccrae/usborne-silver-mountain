@@ -1,0 +1,332 @@
+flagv[] meanings in silverm.c
+================================
+
+General notes
+-------------
+
+flagv has valid saved indexes 1..70. Index 0 exists only because the array is
+allocated as FLAG_COUNT + 1; the game never saves or intentionally uses it.
+
+For carried objects, flagv[object_number] is also used as a hidden/visible
+switch. When flagv[i] == 1, object i is hidden and "GET <object>" reports
+"WHAT <object>?". When flagv[i] == 0, an object at the current room can be
+seen and taken. This convention matters mostly for indexes 1..28, because
+those are the carried object indexes.
+
+Index meanings
+--------------
+
+0
+    Unused array slot.
+
+1
+    Hidden/visible flag for COINS. Initially hidden. Examining the chest in
+    the white cottage reveals them.
+
+2
+    Hidden/visible flag for SHEET. Initially hidden. Examining the bed in the
+    stable reveals it.
+
+3
+    Hidden/visible flag for BOOTS. Initially hidden. Opening the cupboard in
+    the cupboard room reveals them.
+
+4
+    Hidden/visible flag for HORSESHOE. Initially hidden. Examining the door at
+    the stone circle reveals it.
+
+5
+    Hidden/visible flag for APPLES. Initially hidden. Examining the trees in
+    the orchard reveals them.
+
+6
+    Hidden/visible flag for BUCKET. It starts visible and is never otherwise
+    used as a state flag.
+
+7
+    Hidden/visible flag for AXE. It starts visible and is never otherwise used
+    as a state flag.
+
+8
+    Hidden/visible flag for BOAT. It starts visible and is never otherwise used
+    as a state flag.
+
+9
+    Hidden/visible flag for PHIAL. Initially hidden. Opening the cupboard in
+    the kitchens reveals it.
+
+10
+    Hidden/visible flag for REEDS. It starts visible and is never otherwise
+    used as a state flag.
+
+11
+    Hidden/visible flag for BONE. It starts visible and is never otherwise used
+    as a state flag.
+
+12
+    Hidden/visible flag for SHIELD. Initially hidden. After the pool is
+    emptied, examining the pool reveals it.
+
+13
+    Hidden/visible flag for PLANKS. Initially hidden. Entering/searching in the
+    mountain hut reveals them.
+
+14
+    Hidden/visible flag for ROPE. It starts visible and is never otherwise used
+    as a state flag.
+
+15
+    Hidden/visible flag for RING. It starts visible and is never otherwise used
+    as a state flag.
+
+16
+    Hidden/visible flag for JUG. Initially hidden. Examining the kiln/old kiln
+    reveals it.
+
+17
+    Hidden/visible flag for NET. Initially hidden. Examining the ketch reveals
+    it.
+
+18
+    Hidden/visible flag for SWORD. It starts visible and is never otherwise
+    used as a state flag.
+
+19
+    Hidden/visible flag for SILVER PLATE. It starts visible and is never
+    otherwise used as a state flag.
+
+20
+    Hidden/visible flag for UNIFORM. Initially hidden. Moving south from the
+    banqueting hall while the Grargs are present reveals it and makes the
+    Grarg in the room asleep.
+
+21
+    Hidden/visible flag for KEY. Initially hidden. Opening Ogban's safe with
+    the generated code reveals it.
+
+22
+    Hidden/visible flag for SEEDS. Initially hidden. Examining the sacks in the
+    upper floor reveals them.
+
+23
+    Hidden/visible flag for LAMP. It starts visible and is never otherwise used
+    as a state flag.
+
+24
+    Hidden/visible flag for BREAD. It starts visible and is never otherwise
+    used as a state flag.
+
+25
+    Hidden/visible flag for BROOCH. It starts visible and is never otherwise
+    used as a state flag.
+
+26
+    Hidden/visible flag for MATCHES. The matches start at GONE and are moved
+    directly into inventory by examining the uniform; this flag is not changed.
+
+27
+    Hidden/visible flag for STONE OF DESTINY. It starts visible and is never
+    otherwise used as a state flag. Winning requires carrying it while saying
+    the correct magic words in the Silver Chamber.
+
+28
+    Hidden/visible flag for APPLE. This object is a singular proxy for APPLES:
+    taking APPLES removes object 28, and taking APPLE puts object 5 in
+    inventory. The room-description loop does not list object 28, and this flag
+    is not otherwise changed.
+
+29
+    Boots are being worn. In the BBC BASIC original, WEAR BOOTS sets this,
+    prints "YOU ARE INVISIBLE", and clears flagv[55]. While set, it suppresses
+    Grarg patrol danger and increments flagv[39] on each move until the boots
+    wear out. The current C port checks and clears this flag, but does not set
+    it in do_wear.
+
+30
+    Boat power/sail attachment state. When set, the boat can leave the icy lake
+    edge westward, and dropping/taking the boat also moves the sheet with it.
+    It is cleared when the sheet is taken or dropped.
+
+31
+    Boat kept afloat in rough water. Set by the action that reports "YOU HAVE
+    KEPT AFLOAT"; required to go south from rough water.
+
+32
+    Ogban's boar has been caught/dealt with. Set by throwing the net at the
+    boar; required to go north from the barren countryside.
+
+33
+    Pool emptied / gates opened. Set by turning the handle at the sluice gates.
+    Before it is set, examining the pool reports a glimmer in the depths; after
+    it is set, examining the pool reveals the shield.
+
+34
+    Jug is full of water. Set by filling the jug at the stream. Cleared when
+    dropping the jug, with the response "YOU LOST THE WATER!".
+
+35
+    Goblin guardian ghost freed. Set by blowing the reeds in the turret/ghost
+    room. Until set, most actions in room 56 are blocked by the ghost.
+
+36
+    Parser scratch flag in the BBC BASIC original. It is cleared before noun
+    lookup, then set when the parser retries by pluralising the noun text. This
+    prevents repeated pluralisation attempts. The current C port implements
+    noun plural retry without using this flag.
+
+37
+    Seeds planted in the high-walled garden.
+
+38
+    Vine grown in the high-walled garden. Set after watering planted seeds with
+    a full jug; allows climbing the vine from the garden to the inscribed
+    cavern.
+
+39
+    Boot wear counter. Incremented on movement while flagv[29] is set. If it
+    exceeds 5, the boots wear out, flagv[29] is cleared, and the boots are
+    removed from the game.
+
+40
+    Sheet tied at the well. Set by the tying action that moves the sheet to the
+    top of the well. Climbing it takes the player down but tears the sheet and
+    clears this flag.
+
+41
+    Random three-digit safe code. Generated at new game start. Inserting a coin
+    into the slot machine prints this number; opening Ogban's safe requires the
+    same number.
+
+42
+    Random required bell-ring count, from 2 to 4. The hermit tells the player
+    this number in exchange for the brooch. Ringing the silver bell this many
+    times opens the rock door.
+
+43
+    Horseshoe loosened/freed. Initially 0, which prevents taking the horseshoe
+    because it is nailed on. Lighting/burning the wooden door at the stone
+    circle sets it, allowing the horseshoe to be taken.
+
+44
+    Coin count. Starts at 4. Giving coins/coin or inserting a coin decrements
+    it. When it reaches 0, the COINS object is moved to GONE. Inventory prints
+    "COIN" instead of "COINS" when this value is 1.
+
+45
+    Rubble moved from the hallow tomb side. Set by moving rubble in room 4;
+    unlocks travel between the tomb and the stalactite/stalagmite room.
+
+46
+    Hound distracted. Set by giving the bone to the hound; allows travel east
+    from the glass gates. Cleared when moving south from the palace entrance
+    hall.
+
+47
+    Poison has been placed for Ogban. Set by using/pointing the phial at the
+    kitchens or goblet in the throne room area. When the player later leaves
+    the library, this causes flagv[68] to be set.
+
+48
+    Grarg state in the banqueting hall. 0 means Grargs are feasting. 1 means
+    there is a sleeping Grarg. Moving south from the banqueting hall sets this
+    and reveals the uniform.
+
+49
+    Inventory scratch flag in the BBC BASIC original. It is cleared before
+    printing inventory and set if at least one carried object is printed, so
+    the game knows whether to print "NOTHING". The current C port uses a local
+    variable instead.
+
+50
+    Lamp is lit brightly enough. Set by lighting the lamp while carrying
+    matches. Required in the dark wine-cellar/cask area.
+
+51
+    Uniform is being worn. In the BBC BASIC original, WEAR UNIFORM sets this,
+    prints "YOU ARE DISGUISED", and clears flagv[55]. While set, it suppresses
+    Grarg patrol danger. The current C port checks and clears this flag, but
+    does not set it in do_wear.
+
+52
+    Random selector for the third sacred word. Values 0..2 choose which of
+    flagv[57], flagv[58], or flagv[59] is mentioned in the books, and which of
+    PROTECT/LEAD/HELP is the final word accepted in the Silver Chamber.
+
+53
+    Rope tied at the top of the well. Set by tying the rope at room 72. Allows
+    climbing down; if climbed from below, the rope falls and this flag is
+    cleared.
+
+54
+    Charm trio assembled. Set when the player has the horseshoe, shield, and
+    ring in inventory. Required to move south from the mosaic-floored hall
+    toward the throne room.
+
+55
+    Grarg patrol warning is active. Entering certain dangerous rooms without
+    protection sets this flag and warns that a patrol approaches. The next move
+    without boots/uniform causes failure.
+
+56
+    Failure/death flag. Many fatal actions set this. after_turn sees it, prints
+    the failure message, and starts a new game.
+
+57
+    Room number for one possible third-word clue: ancient stone circle (room
+    68). Used when flagv[52] == 0, corresponding to the sacred word PROTECT.
+
+58
+    Room number for one possible third-word clue: high pinnacle (room 54). Used
+    when flagv[52] == 1, corresponding to the sacred word LEAD.
+
+59
+    Room number for one possible third-word clue: high-walled garden (room 15).
+    Used when flagv[52] == 2, corresponding to the sacred word HELP.
+
+60
+    First sacred word has been spoken in the Silver Chamber. Set by saying
+    AWAKE while carrying the Stone of Destiny.
+
+61
+    Second sacred word has been spoken in the Silver Chamber. Set by saying
+    GUIDE after flagv[60] is set.
+
+62
+    Quest complete. Set when the selected third sacred word is spoken after
+    the first two words. after_turn sees it and prints the victory ending.
+
+63
+    Wizard defeated. Set by reflecting the wizard's glare with the silver
+    plate. Until set, room 48 blocks most actions.
+
+64
+    Troll toll / bridge-crossing permission. Set by giving coin(s) at either
+    end of the bridge. It lets the player cross the bridge once and is consumed
+    by movement.
+
+65
+    Rats gone. Set by giving food to the rats in the wine-cellar/cask area.
+    Required to move safely through room 38.
+
+66
+    Cobwebs cleared. Set by breaking/cutting the cobwebs with the sword.
+    Required for some exits from the cobwebby room.
+
+67
+    Rough-water turn counter. Incremented each turn spent in room 41. At 10,
+    the player sinks and flagv[56] is set.
+
+68
+    Ogban is dead. Set after poison has been placed and the player moves from
+    the library. Required to move south from the throne-room area without being
+    killed by Ogban. Also makes "OGBAN (DEAD)" visible in room 59.
+
+69
+    Saved-room value in the BBC BASIC original. The original stores the current
+    room in F(69) before saving and restores R from F(69) after loading. The
+    current C save format stores g->room separately, so flagv[69] is only set
+    before saving and is not read.
+
+70
+    Wizard lair door unlocked. Set by unlocking the door in room 48 with the
+    key. Required to move west from the wizard's lair.
