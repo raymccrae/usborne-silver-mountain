@@ -139,8 +139,7 @@ Index meanings
     Boots are being worn. In the BBC BASIC original, WEAR BOOTS sets this,
     prints "YOU ARE INVISIBLE", and clears flagv[55]. While set, it suppresses
     Grarg patrol danger and increments flagv[39] on each move until the boots
-    wear out. The current C port checks and clears this flag, but does not set
-    it in do_wear.
+    wear out.
 
 30
     Boat power/sail attachment state. When set, the boat can leave the icy lake
@@ -244,8 +243,7 @@ Index meanings
 51
     Uniform is being worn. In the BBC BASIC original, WEAR UNIFORM sets this,
     prints "YOU ARE DISGUISED", and clears flagv[55]. While set, it suppresses
-    Grarg patrol danger. The current C port checks and clears this flag, but
-    does not set it in do_wear.
+    Grarg patrol danger.
 
 52
     Random selector for the third sacred word. Values 0..2 choose which of

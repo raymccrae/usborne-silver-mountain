@@ -758,6 +758,16 @@ static void do_say(Game *g) {
 
 static void do_wear(Game *g) {
     if (g->noun == 5 || g->noun == 10) do_get(g);
+    if (g->noun == 3) {
+        flagv[29] = 1;
+        flagv[55] = 0;
+        set_encoded_response(g, "ZPV BSF JOWJTJCMF");
+    }
+    if (g->noun == 20) {
+        flagv[51] = 1;
+        flagv[55] = 0;
+        set_encoded_response(g, "ZPV BSF EJTHVJTFE");
+    }
 }
 
 static void do_remove(Game *g) {
