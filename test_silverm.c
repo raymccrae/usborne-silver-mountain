@@ -36,9 +36,9 @@ static void deterministic_new_game(Game *g) {
     new_game(g);
     snprintf(maze_path[0], sizeof(maze_path[0]), "NNNNNNNN");
     snprintf(maze_path[1], sizeof(maze_path[1]), "SSSSSSSS");
-    flagv[41] = 123;
-    flagv[42] = 3;
-    flagv[52] = 0;
+    flagv[FLAGV_SAFE_CODE] = 123;
+    flagv[FLAGV_BELL_RING_COUNT] = 3;
+    flagv[FLAGV_THIRD_WORD_SELECTOR] = 0;
 }
 
 static void command(Game *g, const char *text) {
@@ -77,10 +77,10 @@ static void run_problem_checks(void) {
     g.room = 80;
     command(&g, "EXAMINE POT");
     command(&g, "GET COINS");
-    check(loc[1] == INVENTORY && flagv[44] == 4, "getting coins gives four coins");
+    check(loc[1] == INVENTORY && flagv[FLAGV_COIN_COUNT] == 4, "getting coins gives four coins");
     snprintf(filename, sizeof(filename), "/tmp/silverm-test-save-%ld.sav", (long)getpid());
     check(save_game(&g, filename), "save_game succeeds");
-    check(flagv[44] == 4 && loc[1] == INVENTORY, "saving does not lose coins");
+    check(flagv[FLAGV_COIN_COUNT] == 4 && loc[1] == INVENTORY, "saving does not lose coins");
     remove(filename);
 
     deterministic_new_game(&g);
@@ -89,7 +89,7 @@ static void run_problem_checks(void) {
     command(&g, "GET COINS");
     g.room = 75;
     command(&g, "GIVE COIN");
-    check(flagv[44] == 3 && loc[1] == INVENTORY, "GIVE COIN spends one coin");
+    check(flagv[FLAGV_COIN_COUNT] == 3 && loc[1] == INVENTORY, "GIVE COIN spends one coin");
 
     deterministic_new_game(&g);
     g.room = 80;
@@ -97,11 +97,11 @@ static void run_problem_checks(void) {
     command(&g, "GET COINS");
     g.room = 75;
     command(&g, "GIVE COINS");
-    check(flagv[44] == 0 && loc[1] == GONE, "GIVE COINS keeps original all-coins behavior");
+    check(flagv[FLAGV_COIN_COUNT] == 0 && loc[1] == GONE, "GIVE COINS keeps original all-coins behavior");
 
     deterministic_new_game(&g);
     g.room = 60;
-    flagv[3] = 0;
+    flagv[FLAGV_BOOTS_HIDDEN] = 0;
     command(&g, "GET BOOTS");
     command(&g, "WEAR BOOTS");
     command(&g, "N");
@@ -110,15 +110,15 @@ static void run_problem_checks(void) {
     command(&g, "E");
     command(&g, "W");
     command(&g, "E");
-    check(flagv[29] == 0 && loc[3] == GONE, "boots wear out after too many moves");
+    check(flagv[FLAGV_BOOTS_WORN] == 0 && loc[3] == GONE, "boots wear out after too many moves");
 
     deterministic_new_game(&g);
     g.room = 80;
     command(&g, "GET COINS");
-    check(flagv[1] == 1 && loc[1] == 80, "coins are hidden before examining pot");
+    check(flagv[FLAGV_COINS_HIDDEN] == 1 && loc[1] == 80, "coins are hidden before examining pot");
     command(&g, "EXAMINE POT");
     command(&g, "GET COINS");
-    check(flagv[1] == 0 && loc[1] == INVENTORY, "examining pot reveals coins");
+    check(flagv[FLAGV_COINS_HIDDEN] == 0 && loc[1] == INVENTORY, "examining pot reveals coins");
 }
 
 static void run_full_playthrough(void) {
@@ -208,7 +208,7 @@ static void run_full_playthrough(void) {
         command(&g, win[i]);
     }
 
-    check(flagv[62] == 1, "full playthrough reaches victory flag");
+    check(flagv[FLAGV_QUEST_COMPLETE] == 1, "full playthrough reaches victory flag");
     check(g.running == 0, "full playthrough stops after victory");
 }
 
