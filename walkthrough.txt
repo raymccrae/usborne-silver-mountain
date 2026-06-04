@@ -1,0 +1,47 @@
+MYSTERY OF SILVER MOUNTAIN
+Chris Oxlade and Judy Tatchell
+Walk Through by Dorothy Millard (C64 Version)
+
+Notes:
+1. When you save your position you appear to lose a coin each time.  Also sometimes the save doesn't work properly.  Sometimes coins just seem to disappear for no apparent reason.  To get around this coins problem, list line 4490 and change F(44)=4 to the number of coins you wish - I suggest =10, then if you forget something you can go back for it.
+2. To make the boots last longer list line 1200.  IF F(39)=5, and change the 5 to whatever number you wish - I suggest 12.
+3. When you give the coin to the troll and the apple to the pony make sure you type in the singular, ie. COIN not COINS and APPLE not APPLES (otherwise the troll or the pony take them all). 
+4. In some locations objects to be examined are not mentioned in the location description.  However these are shown in the book from which the game was typed.
+5. At various points throughout the game you will be given a number.  Make a note of it as it is needed later in the game.
+6. Magic Words - The magic words are listed in the book shown of the picture of the library, with a graphic representation beside each one.
+* GUIDE - Crossroads (the clue is an up arrow).
+* AWAKE - Fountain (the clue is an eye in the picture in the book).
+* HELP - High walled garden (the clue is an outlined "C" in the picture in the book).
+* PROTECT - Stone Circle (the clue is a circle of nine dots representing the stones).
+* LEAD - High pinnacle (the clue is a horizontal arrow in the picture in the book).
+
+Walk Through
+(Start at a crossroads), E, E, E (white cottage), EXAMINE CHEST (empty), EXAMINE POT (you find some coins), GET COINS, GET BREAD, U (attic bedroom), EXAMINE BED, GET SHEET, N (by cupboard), OPEN CUPBOARD, GET BOOTS, S, D, W, W, W, W, W (a troll stops you crossing), GIVE COIN (he takes it), CROSS BRIDGE, W (small orchard), EXAMINE TREES (apple trees), GET APPLES, W (burnt out campfire), W (A Grarg patrol approaches and will kill you if you continue), WEAR BOOTS (you are invisible to the Grargs), W (top of deep well), REMOVE BOOTS (they wear out quickly if you continue wearing tem), GET BUCKET, E (burnt-out campfire), WEAR BOOTS (you are invisible again to avoid the Grarg patrol), N (woodman's hut), REMOVE BOOTS, GET AXE, N (pitted track).
+
+W (edge of icy lake), GET BOAT, W (you have no power), USE SHEET (to make a sail), W (middle of lake), N (rough water), N (island shore), DROP BOAT, N (kiln), EXAMINE KILN, GET JUG, N (marshy inlet), GET REEDS, S, S, E (beached ketch), EXAMINE KETCH (it's fishy - see a net), GET NET, W (back to island shore), GET BOAT (you automatically get the sheet as well), S (rough water), S (the boat is sinking), USE BUCKET (you have kept afloat), S (middle of lake), E (back to edge of lake), DROP BOAT, DROP BUCKET, GET SHEET, E.
+
+N, E (windmill), U (upper floor), GET SACKS (too heavy), EXAMINE SACKS (see seeds), GET SEEDS, D, W, N (barren countryside), N (Ogban boar blocks your path), THROW NET (you caught the boar), N (by a disused waterwheel), TURN WHEEL (it goes round), N (gamekeeper's cottage), GET LAMP, E (misty pool), EXAMINE POOL (see a glimmering from the depths), S (sluice gates), EXAMINE SLUICE GATES (there is a handle), TURN HANDLE (the gates open and the pool empties), N, EXAMINE POOL, GET SHIELD, W, S, W (overgrown track where you meet a pony), GIVE APPLE (he leads you north near to some rusty gates), N (goblins graveyard), READ INSCRIPTIONS (a faded word  "M R H S"), E (hollow tomb), E (a pile of rubble blocks your path), MOVE RUBBLE (you cannot move it from here), W, W (into a half-dug grave), GET BONE, E, S (rusty gates), GIVE APPLE (to the pony who leads you south), E, S, S, S (pitted track).
+
+S, E, E (stream) FILL JUG (with water), S (bridge), E (the troll is still here), GIVE COIN, CROSS BRIDGE, E, E, N (ancient stone circle), EXAMINE STONES (there are nine), W, W (deep dark wood), N (fallen oak), BLOW REED (the ghost of the goblin guardian is free), DROP REEDS, N (scree slope), N (by mountain hut), ENTER HUT (you find some planks), GET PLANKS, W (frozen pond), DROP PLANKS, S, D, W (high pinnacle), GET ROPE, E, N, U (back to frozen pond), N, N (high walled garden), PLANT SEEDS, WATER SEEDS (with the jug of water - a large vine grows in seconds), DROP JUG, DROP SEEDS, CLIMB VINE (to an inscribed cavern).
+
+READ INSCRIPTION (this is random so make a note of it), N (into a vaulted cavern), W (into a maze of tunnels), W (you are lost in the tunnels - remember the inscription), .................... (type the directions you were given - you find yourself near some stalactites and stalagmites), W (a pile of rubble blocks this direction), E (maze of tunnels), E (you are lost again), ................. (this time type the directions backwards and reversed, for example ESENNSWE would become WENSSWNW - you find yourself back at the vaulted cavern).
+
+E (glass gates), S (ornate fountain), N, E (a hound blocks your path), GIVE BONE (he is distracted), E (palace entrance hall), E (Grarg sentry post), E (a Grarg patrol approaches), WEAR BOOTS (you are invisible), E (guard room), REMOVE BOOTS, GET SWORD, WEAR BOOTS (invisible again), S (palace kitchens), REMOVE BOOTS, EXAMINE KITCHEN (there is a large cupboard in the corner), OPEN CUPBOARD, GET PHIAL, EXAMINE PHIAL (the label reads "POISON"), S (battlements), GET BROOCH, N, W (long gallery), S (banqueting all where you see Grargs feasting), EXAMINE GRARGS (very ugly), WEAR BOOTS (you are invisible), S (hall of tapestries), REMOVE BOOTS, S (into mosaic floored hall), POISON WINE, E (a mysterious force holds you back - note if you go south you meet Ogban who kills you), N, N (back to banqueting hall where the Grarg is now sleeping and you see a uniform), DROP BOOTS (they are almost worn out anyway), GET UNIFORM, WEAR UNIFORM (you are now disguised and the Grargs will no longer bother you), EXAMINE UNIFORM (you find some matches in a pocket), N, E, N.
+
+W, W (entrance hall - note you can't return through the glass gates), S (dank corridor containing an oak door), SWING AXE (door smashes), S (dungeons), S (wine cellar), W (it's dark), LIGHT LAMP (using the matches), W (this time rats nibble your ankles), GIVE BREAD (the rats scurry away), W (this time you make it and are by a row of casks), OPEN CASK (see a passage), W (shady hollow), E (ancient stone circle), E, E (stable), EXAMINE STABLE (there is a wooden door), EXAMINE DOOR (you see a horseshoe), GET HORSESHOE (it's firmly nailed on), OPEN DOOR (it falls off), BURN DOOR (it has turned to ashes), GET HORSESHOE, S, W, W, W (bridge), W (the troll is still here), GIVE COIN, CROSS BRIDGE, W, W, W (to top of well), TIE SHEET, CLIMB SHEET (it's torn but you are at the bottom of the well), EXAMINE WELL BOTTOM (there are loose bricks), SWING AXE (you broke through), N (narrow passage), GET RING, E (small cave), S (back to top of well), E, N, E (to where the hermit is), GIVE BROOCH (he takes it and says  "...... rings are needed" - the number he tells you is random so make a note of it), W, N, N, N, N, W (overgrown track), GIVE APPLE (to the pony who leads you north), N (goblin graveyard), E, E (hollow tomb where there is the steep passage you cleared earlier), E, E (maze of tunnels), E (you are lost yet again), ............ (type the directions reversed that you were given earlier which leads you to the vaulted cavern).
+
+E, E (the hound is back), W, S, W, S (gap between boulders), E (perilous path), E (by a silver bell in the rock), RING BELL (how many times?), .......... (type the number given to you by the hermit - a rock door opens), E (dungeons), N, N, E, E, S (kitchens), W, S, S, S (mosaic floored hall), E (now that you are carrying the horseshoe, shield and ring you can pass to the silver throne room), GET SILVER PLATE, N (library), READ BOOK ("magic words lie at the crossroads, the fountain and ....................." - the third location is random and will either be the high pinnacle, stone circle or high walled garden), S.
+
+W (back to mosaic floored hall - now that you have poisoned the wine and visited the library it is safe to go south), S (you are by a safe in Ogban's chamber where you see Ogban dead, poisoned by the wine), W (cobwebby room), W (you are caught in the webs), CUT COBWEBS (using the sword), W (turret room), INSERT COIN (in the slot machine and a random number appears which you should make a note of - if for any reason you don't have a coin to insert, the number you require is the one that has kept popping up throughout the game), E, E (Ogban's safe), OPEN SAFE (what is the code?) .............. (type in the number you've just been given after inserting the coin), GET KEY.
+
+W, N (wizard's lair), W (the wizard has you in his glare), HOLD UP SILVER PLATE (you reflect the wizard's evil glare and he is now dead), W (the door won't open), UNLOCK DOOR (the key turns), DROP KEY, W (into silver chamber), GET STONE OF DESTINY, SAY MAGIC WORDS (you must say them one by one), SAY AWAKE (the mountain rumbles), SAY GUIDE (towers fall down), SAY ............. (the place you were given in the library - see note 6 above).
+
+HOOOOOOOORRRRRRAAAAAAYYYYYY!
+You have succeeded in your quest and brought peace to the land.
+
+
+Taken from Dorothy Irene's site: http://dorothyirene.fateback.com/
+
+*****************************************************
+Displayed on the Classic Adventures Solution Archive:
+http://solutionarchive.com
