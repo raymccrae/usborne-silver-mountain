@@ -74,7 +74,7 @@ static void run_problem_checks(void) {
     char filename[128];
 
     deterministic_new_game(&g);
-    g.room = 80;
+    g.room = ROOM_WHITE_COTTAGE;
     command(&g, "EXAMINE POT");
     command(&g, "GET COINS");
     check(loc[NOUN_COINS] == INVENTORY && flagv[FLAGV_COIN_COUNT] == 4, "getting coins gives four coins");
@@ -84,23 +84,23 @@ static void run_problem_checks(void) {
     remove(filename);
 
     deterministic_new_game(&g);
-    g.room = 80;
+    g.room = ROOM_WHITE_COTTAGE;
     command(&g, "EXAMINE POT");
     command(&g, "GET COINS");
-    g.room = 75;
+    g.room = ROOM_BRIDGE_WEST_END;
     command(&g, "GIVE COIN");
     check(flagv[FLAGV_COIN_COUNT] == 3 && loc[NOUN_COINS] == INVENTORY, "GIVE COIN spends one coin");
 
     deterministic_new_game(&g);
-    g.room = 80;
+    g.room = ROOM_WHITE_COTTAGE;
     command(&g, "EXAMINE POT");
     command(&g, "GET COINS");
-    g.room = 75;
+    g.room = ROOM_BRIDGE_WEST_END;
     command(&g, "GIVE COINS");
     check(flagv[FLAGV_COIN_COUNT] == 0 && loc[NOUN_COINS] == GONE, "GIVE COINS keeps original all-coins behavior");
 
     deterministic_new_game(&g);
-    g.room = 60;
+    g.room = ROOM_CUPBOARD_ROOM;
     flagv[FLAGV_BOOTS_HIDDEN] = 0;
     command(&g, "GET BOOTS");
     command(&g, "WEAR BOOTS");
@@ -113,9 +113,9 @@ static void run_problem_checks(void) {
     check(flagv[FLAGV_BOOTS_WORN] == 0 && loc[NOUN_BOOTS] == GONE, "boots wear out after too many moves");
 
     deterministic_new_game(&g);
-    g.room = 80;
+    g.room = ROOM_WHITE_COTTAGE;
     command(&g, "GET COINS");
-    check(flagv[FLAGV_COINS_HIDDEN] == 1 && loc[NOUN_COINS] == 80, "coins are hidden before examining pot");
+    check(flagv[FLAGV_COINS_HIDDEN] == 1 && loc[NOUN_COINS] == ROOM_WHITE_COTTAGE, "coins are hidden before examining pot");
     command(&g, "EXAMINE POT");
     command(&g, "GET COINS");
     check(flagv[FLAGV_COINS_HIDDEN] == 0 && loc[NOUN_COINS] == INVENTORY, "examining pot reveals coins");
@@ -154,7 +154,7 @@ static void run_full_playthrough(void) {
         command(&g, commands[i]);
     }
     command_with_input(&g, "E", "N\nN\nN\nN\nN\nN\nN\nN\n");
-    expect_room(&g, 6, "first return through maze");
+    expect_room(&g, ROOM_VAULTED_CAVERN, "first return through maze");
 
     const char *palace[] = {
         "E", "S", "N", "E", "GIVE BONE", "E", "E", "E", "WEAR BOOTS", "E",
@@ -176,7 +176,7 @@ static void run_full_playthrough(void) {
         command(&g, palace[i]);
     }
     command_with_input(&g, "E", "N\nN\nN\nN\nN\nN\nN\nN\n");
-    expect_room(&g, 6, "second return through maze");
+    expect_room(&g, ROOM_VAULTED_CAVERN, "second return through maze");
 
     const char *finale[] = {
         "E", "E", "W", "S", "W", "S", "E", "E",

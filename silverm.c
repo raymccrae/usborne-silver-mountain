@@ -6,7 +6,7 @@
 
 #include "silverm.h"
 
-#define ROOM_COUNT 80
+#define ROOM_COUNT ROOM_WHITE_COTTAGE
 #define CARRIED_OBJECTS 28
 #define NOUN_COUNT 88
 #define VERB_COUNT 57
@@ -130,8 +130,15 @@ static const char *initial_exits[ROOM_COUNT + 1] = {
 };
 
 static const int initial_locations[CARRIED_OBJECTS + 1] = {
-    0, 80, 70, 60, 69, 74, 72, 63, 52, 20, 11, 1, 14, 36, 54,
-    61, 21, 32, 10, 50, 29, 59, 34, 13, 80, 30, 81, 47, 74
+    ROOM_NONE, ROOM_WHITE_COTTAGE, ROOM_ATTIC_BEDROOM, ROOM_CUPBOARD_ROOM,
+    ROOM_STABLE, ROOM_ORCHARD, ROOM_TOP_OF_WELL, ROOM_WOODMANS_HUT,
+    ROOM_ICY_LAKE_EDGE, ROOM_KITCHENS, ROOM_MARSHY_INLET,
+    ROOM_HALF_DUG_GRAVE, ROOM_MISTY_POOL, ROOM_MOUNTAIN_HUT,
+    ROOM_HIGH_PINNACLE, ROOM_NARROW_PASSAGE, ROOM_OLD_KILN,
+    ROOM_BEACHED_KETCH, ROOM_GUARD_ROOM, ROOM_SILVER_THRONE_ROOM,
+    ROOM_BANQUETING_HALL, ROOM_OGBANS_SAFE, ROOM_SACKS_UPPER_FLOOR,
+    ROOM_GAMEKEEPERS_COTTAGE, ROOM_WHITE_COTTAGE, ROOM_PALACE_BATTLEMENTS,
+    GONE, ROOM_SILVER_CHAMBER, ROOM_ORCHARD
 };
 
 static const int initially_hidden[] = {
@@ -262,12 +269,12 @@ static void new_game(Game *g) {
     flagv[FLAGV_SAFE_CODE] = rand() % 900 + 100;
     flagv[FLAGV_BELL_RING_COUNT] = rand() % 3 + 2;
     flagv[FLAGV_COIN_COUNT] = 4;
-    flagv[FLAGV_THIRD_WORD_ROOM_PROTECT] = 68;
-    flagv[FLAGV_THIRD_WORD_ROOM_LEAD] = 54;
-    flagv[FLAGV_THIRD_WORD_ROOM_HELP] = 15;
+    flagv[FLAGV_THIRD_WORD_ROOM_PROTECT] = ROOM_ANCIENT_STONE_CIRCLE;
+    flagv[FLAGV_THIRD_WORD_ROOM_LEAD] = ROOM_HIGH_PINNACLE;
+    flagv[FLAGV_THIRD_WORD_ROOM_HELP] = ROOM_HIGH_WALLED_GARDEN;
     flagv[FLAGV_THIRD_WORD_SELECTOR] = rand() % 3;
     random_maze();
-    g->room = 77;
+    g->room = ROOM_CROSSROADS;
     g->running = 1;
     set_response(g, "GOOD LUCK ON YOUR QUEST!");
 }
@@ -337,7 +344,7 @@ static int load_game(Game *g, const char *name) {
     fclose(fp);
     g->running = 1;
     set_response(g, "OK. CARRY ON");
-    return g->room >= 1 && g->room <= ROOM_COUNT;
+    return g->room >= ROOM_HALF_DUG_GRAVE && g->room <= ROOM_WHITE_COTTAGE;
 }
 
 static int ask_filename(char *name, size_t size) {
@@ -366,12 +373,12 @@ static void SILVERM_UNUSED describe_room(const Game *g) {
             strncat(visible, item, sizeof(visible) - strlen(visible) - 1);
         }
     }
-    if (g->room == 29 && flagv[FLAGV_GRARG_SLEEPING] == 0) strncat(visible, " GRARGS FEASTING,", sizeof(visible) - strlen(visible) - 1);
-    if (g->room == 29 && flagv[FLAGV_GRARG_SLEEPING] == 1) strncat(visible, " A SLEEPING GRARG,", sizeof(visible) - strlen(visible) - 1);
-    if (g->room == 12 || g->room == 22) strncat(visible, " A PONY,", sizeof(visible) - strlen(visible) - 1);
-    if (g->room == 64) strncat(visible, " A HERMIT,", sizeof(visible) - strlen(visible) - 1);
-    if (g->room == 18 && strcmp(exits[18], "N") == 0) strncat(visible, " AN OAK DOOR,", sizeof(visible) - strlen(visible) - 1);
-    if (g->room == 59 && flagv[FLAGV_OGBAN_DEAD] == 1) strncat(visible, " OGBAN (DEAD),", sizeof(visible) - strlen(visible) - 1);
+    if (g->room == ROOM_BANQUETING_HALL && flagv[FLAGV_GRARG_SLEEPING] == 0) strncat(visible, " GRARGS FEASTING,", sizeof(visible) - strlen(visible) - 1);
+    if (g->room == ROOM_BANQUETING_HALL && flagv[FLAGV_GRARG_SLEEPING] == 1) strncat(visible, " A SLEEPING GRARG,", sizeof(visible) - strlen(visible) - 1);
+    if (g->room == ROOM_RUSTY_GATES || g->room == ROOM_OVERGROWN_TRACK) strncat(visible, " A PONY,", sizeof(visible) - strlen(visible) - 1);
+    if (g->room == ROOM_WOODED_VALLEY_SIDE) strncat(visible, " A HERMIT,", sizeof(visible) - strlen(visible) - 1);
+    if (g->room == ROOM_DANK_CORRIDOR && strcmp(exits[ROOM_DANK_CORRIDOR], "N") == 0) strncat(visible, " AN OAK DOOR,", sizeof(visible) - strlen(visible) - 1);
+    if (g->room == ROOM_OGBANS_SAFE && flagv[FLAGV_OGBAN_DEAD] == 1) strncat(visible, " OGBAN (DEAD),", sizeof(visible) - strlen(visible) - 1);
     if (visible[0]) {
         snprintf(line, sizeof(line), ", YOU CAN SEE%s", visible);
         wrap_print(line);
@@ -501,7 +508,7 @@ static void do_move_direction(Game *g) {
     int d = g->verb;
     if (d == 5) d = 1;
     if (d == 6) d = 3;
-    if (!(((g->room == 75 && d == 2) || (g->room == 76 && d == 4))) || flagv[FLAGV_TROLL_TOLL_PAID] == 1) {
+    if (!(((g->room == ROOM_BRIDGE_WEST_END && d == 2) || (g->room == ROOM_BRIDGE_EAST_END && d == 4))) || flagv[FLAGV_TROLL_TOLL_PAID] == 1) {
     } else {
         set_response(g, "A TROLL STOPS YOU CROSSING");
         return;
@@ -513,92 +520,92 @@ static void do_move_direction(Game *g) {
             set_response(g, "GRARGS HAVE GOT YOU!");
             return;
         }
-        if (g->room == 29 && flagv[FLAGV_GRARG_SLEEPING] == 0) {
+        if (g->room == ROOM_BANQUETING_HALL && flagv[FLAGV_GRARG_SLEEPING] == 0) {
             set_response(g, "GRARGS WILL SEE YOU!");
             return;
         }
-        if (g->room == 73 || g->room == 42 || g->room == 9 || g->room == 10) {
+        if (g->room == ROOM_BURNT_OUT_CAMPFIRE || g->room == ROOM_PLOUGHED_FIELD || g->room == ROOM_GRARG_SENTRY_POST || g->room == ROOM_GUARD_ROOM) {
             set_response(g, "A GRARG PATROL APPROACHES");
             flagv[FLAGV_GRARG_PATROL_WARNING] = 1;
             return;
         }
     }
-    if (loc[NOUN_BOAT] == INVENTORY && ((g->room == 52 && d == 2) || (g->room == 31 && d != 3))) {
+    if (loc[NOUN_BOAT] == INVENTORY && ((g->room == ROOM_ICY_LAKE_EDGE && d == 2) || (g->room == ROOM_ISLAND_SHORE && d != 3))) {
         set_response(g, "THE BOAT IS TOO HEAVY");
         return;
     }
-    if (loc[NOUN_BOAT] != INVENTORY && ((g->room == 52 && d == 4) || (g->room == 31 && d == 3))) {
+    if (loc[NOUN_BOAT] != INVENTORY && ((g->room == ROOM_ICY_LAKE_EDGE && d == 4) || (g->room == ROOM_ISLAND_SHORE && d == 3))) {
         set_response(g, "YOU CANNOT SWIM");
         return;
     }
-    if (g->room == 52 && loc[NOUN_BOAT] == INVENTORY && d == 4 && flagv[FLAGV_BOAT_POWERED] == 0) {
+    if (g->room == ROOM_ICY_LAKE_EDGE && loc[NOUN_BOAT] == INVENTORY && d == 4 && flagv[FLAGV_BOAT_POWERED] == 0) {
         set_response(g, "NO POWER!");
         return;
     }
-    if (g->room == 41 && d == 3 && flagv[FLAGV_BOAT_KEPT_AFLOAT] == 0) {
+    if (g->room == ROOM_ROUGH_WATER && d == 3 && flagv[FLAGV_BOAT_KEPT_AFLOAT] == 0) {
         set_response(g, "THE BOAT IS SINKING!");
         return;
     }
-    if (g->room == 33 && d == 1 && flagv[FLAGV_BOAR_CAUGHT] == 0) {
+    if (g->room == ROOM_BARREN_COUNTRYSIDE && d == 1 && flagv[FLAGV_BOAR_CAUGHT] == 0) {
         set_response(g, "OGBAN'S BOAR BLOCKS YOUR PATH");
         return;
     }
-    if (((g->room == 3 && d == 2) || (g->room == 4 && d == 4)) && flagv[FLAGV_RUBBLE_MOVED] == 0) {
+    if (((g->room == ROOM_HALLOW_TOMB && d == 2) || (g->room == ROOM_STALACTITES_AND_STALAGMITES && d == 4)) && flagv[FLAGV_RUBBLE_MOVED] == 0) {
         set_response(g, "A PILE OF RUBBLE BLOCKS YOUR PATH");
         return;
     }
-    if (g->room == 35 && loc[NOUN_PLANKS] != g->room) {
+    if (g->room == ROOM_FROZEN_POND && loc[NOUN_PLANKS] != g->room) {
         set_response(g, "THE ICE IS BREAKING!");
         return;
     }
-    if (g->room == 5 && (d == 2 || d == 4)) {
+    if (g->room == ROOM_MAZE_OF_TUNNELS && (d == 2 || d == 4)) {
         do_tunnel_maze(g, d);
         if (flagv[FLAGV_PLAYER_DEAD]) return;
     }
-    if (g->room == 4 && d == 4) {
+    if (g->room == ROOM_STALACTITES_AND_STALAGMITES && d == 4) {
         set_response(g, "PASSAGE IS TOO STEEP");
         return;
     }
-    if (g->room == 7 && d == 2 && flagv[FLAGV_HOUND_DISTRACTED] == 0) {
+    if (g->room == ROOM_HIGH_GLASS_GATES && d == 2 && flagv[FLAGV_HOUND_DISTRACTED] == 0) {
         set_response(g, "A HUGE HOUND BARS YOUR WAY");
         return;
     }
-    if ((g->room == 38 || g->room == 37) && flagv[FLAGV_LAMP_LIT] == 0) {
+    if ((g->room == ROOM_WINE_CELLAR || g->room == ROOM_ROW_OF_CASKS) && flagv[FLAGV_LAMP_LIT] == 0) {
         set_response(g, "IT IS TOO DARK");
         return;
     }
-    if (g->room == 49 && d == 2 && flagv[FLAGV_CHARM_TRIO_ASSEMBLED] == 0) {
+    if (g->room == ROOM_MOSAIC_HALL && d == 2 && flagv[FLAGV_CHARM_TRIO_ASSEMBLED] == 0) {
         set_response(g, "MYSTERIOUS FORCES HOLD YOU BACK");
         return;
     }
-    if (g->room == 49 && d == 3 && flagv[FLAGV_OGBAN_DEAD] == 0) {
+    if (g->room == ROOM_MOSAIC_HALL && d == 3 && flagv[FLAGV_OGBAN_DEAD] == 0) {
         set_response(g, "YOU MET OGBAN!!!");
         flagv[FLAGV_PLAYER_DEAD] = 1;
         return;
     }
-    if (g->room == 38 && flagv[FLAGV_RATS_GONE] == 0) {
+    if (g->room == ROOM_WINE_CELLAR && flagv[FLAGV_RATS_GONE] == 0) {
         set_response(g, "RATS NIBBLE YOUR ANKLES");
         return;
     }
-    if (g->room == 58 && (d == 1 || d == 4) && flagv[FLAGV_COBWEBS_CLEARED] == 0) {
+    if (g->room == ROOM_COBWEBBY_ROOM && (d == 1 || d == 4) && flagv[FLAGV_COBWEBS_CLEARED] == 0) {
         set_response(g, "YOU GET CAUGHT IN THE WEBS!");
         return;
     }
-    if (g->room == 48 && d == 4 && flagv[FLAGV_WIZARD_DOOR_UNLOCKED] == 0) {
+    if (g->room == ROOM_WIZARDS_LAIR && d == 4 && flagv[FLAGV_WIZARD_DOOR_UNLOCKED] == 0) {
         set_response(g, "THE DOOR DOES NOT OPEN");
         return;
     }
-    if (g->room == 40 && flagv[FLAGV_POISON_PLACED] == 1) flagv[FLAGV_OGBAN_DEAD] = 1;
-    if (g->room == 37 && d == 4 && strcmp(exits[37], "EW") == 0) {
-        g->room = 67;
+    if (g->room == ROOM_DUSTY_LIBRARY && flagv[FLAGV_POISON_PLACED] == 1) flagv[FLAGV_OGBAN_DEAD] = 1;
+    if (g->room == ROOM_ROW_OF_CASKS && d == 4 && strcmp(exits[ROOM_ROW_OF_CASKS], "EW") == 0) {
+        g->room = ROOM_SHADY_HOLLOW;
         set_response(g, "THE PASSAGE WAS STEEP!");
         return;
     }
-    if (g->room == 29 && d == 3) {
+    if (g->room == ROOM_BANQUETING_HALL && d == 3) {
         flagv[FLAGV_GRARG_SLEEPING] = 1;
         flagv[FLAGV_UNIFORM_HIDDEN] = 0;
     }
-    if (g->room == 8 && d == 2) flagv[FLAGV_HOUND_DISTRACTED] = 0;
+    if (g->room == ROOM_PALACE_ENTRANCE_HALL && d == 2) flagv[FLAGV_HOUND_DISTRACTED] = 0;
     int old = g->room;
     for (size_t i = 0; exits[old][i]; i++) {
         char k = exits[old][i];
@@ -609,7 +616,7 @@ static void do_move_direction(Game *g) {
     }
     set_response(g, "OK");
     if (g->room == old) set_response(g, "YOU CANNOT GO THAT WAY");
-    if ((old == 75 && d == 2) || (old == 76 && d == 4)) set_response(g, "OK. YOU CROSSED");
+    if ((old == ROOM_BRIDGE_WEST_END && d == 2) || (old == ROOM_BRIDGE_EAST_END && d == 4)) set_response(g, "OK. YOU CROSSED");
     if (flagv[FLAGV_BOOTS_WORN] == 1) flagv[FLAGV_BOOT_WEAR_COUNTER]++;
     if (flagv[FLAGV_BOOT_WEAR_COUNTER] > 5 && flagv[FLAGV_BOOTS_WORN] == 1) {
         set_response(g, "BOOTS HAVE WORN OUT");
@@ -711,7 +718,7 @@ static void do_examine(Game *g) {
     }
     if (h == 2969 && flagv[FLAGV_GRARG_SLEEPING] == 1) set_response(g, "VERY UGLY!");
     if (h == 7158 || h == 7186) set_response(g, "THERE ARE LOOSE BRICKS");
-    if (g->room == 49) set_response(g, "VERY INTERESTING!");
+    if (g->room == ROOM_MOSAIC_HALL) set_response(g, "VERY INTERESTING!");
     if (g->noun == NOUN_FOUNTAIN || g->noun == NOUN_PINNACLE || g->noun == NOUN_STATUE) set_response(g, "INTERESTING!");
     if (h == 6978) set_response(g, "THERE IS A WOODEN DOOR");
     if (h == 6970) { set_response(g, "YOU FOUND SOMETHING"); flagv[FLAGV_HORSESHOE_HIDDEN] = 0; }
@@ -722,12 +729,12 @@ static void do_examine(Game *g) {
 
 static void do_give(Game *g) {
     int h = hcode(g);
-    if (g->room == 64) set_response(g, "HE GIVES IT BACK!");
+    if (g->room == ROOM_WOODED_VALLEY_SIDE) set_response(g, "HE GIVES IT BACK!");
     if (h == 6425) {
         snprintf(g->response, sizeof(g->response), "HE TAKES IT AND SAYS '%d RINGS ARE NEEDED'", flagv[FLAGV_BELL_RING_COUNT]);
         loc[NOUN_BROOCH] = GONE;
     }
-    if (g->room == 75 || g->room == 76) set_response(g, "HE DOES NOT WANT IT");
+    if (g->room == ROOM_BRIDGE_WEST_END || g->room == ROOM_BRIDGE_EAST_END) set_response(g, "HE DOES NOT WANT IT");
     if (g->noun == NOUN_COIN && flagv[FLAGV_COIN_COUNT] == 0) set_response(g, "YOU HAVE RUN OUT!");
     if ((h == 7562 || h == 7662) && flagv[FLAGV_COIN_COUNT] > 0 && loc[NOUN_COINS] == INVENTORY) {
         set_response(g, "HE TAKES IT");
@@ -743,10 +750,10 @@ static void do_give(Game *g) {
         flagv[FLAGV_TROLL_TOLL_PAID] = 1;
         flagv[FLAGV_COIN_COUNT] = 0;
     }
-    if (h == 2228 && loc[NOUN_APPLES] == GONE) { append_response(g, "HE LEADS YOU ", "NORTH"); loc[NOUN_APPLE] = GONE; g->room = 12; }
-    if ((h == 2228 && loc[NOUN_APPLES] == INVENTORY) || h == 225) { append_response(g, "HE LEADS YOU ", "NORTH"); g->room = 12; }
-    if ((h == 1228 && loc[NOUN_APPLES] == INVENTORY) || h == 125) { append_response(g, "HE LEADS YOU ", "SOUTH"); g->room = 22; }
-    if (g->room == 7 || g->room == 33) { set_response(g, "HE EATS IT!"); loc[g->noun] = GONE; }
+    if (h == 2228 && loc[NOUN_APPLES] == GONE) { append_response(g, "HE LEADS YOU ", "NORTH"); loc[NOUN_APPLE] = GONE; g->room = ROOM_RUSTY_GATES; }
+    if ((h == 2228 && loc[NOUN_APPLES] == INVENTORY) || h == 225) { append_response(g, "HE LEADS YOU ", "NORTH"); g->room = ROOM_RUSTY_GATES; }
+    if ((h == 1228 && loc[NOUN_APPLES] == INVENTORY) || h == 125) { append_response(g, "HE LEADS YOU ", "SOUTH"); g->room = ROOM_OVERGROWN_TRACK; }
+    if (g->room == ROOM_HIGH_GLASS_GATES || g->room == ROOM_BARREN_COUNTRYSIDE) { set_response(g, "HE EATS IT!"); loc[g->noun] = GONE; }
     if (h == 711) { flagv[FLAGV_HOUND_DISTRACTED] = 1; set_response(g, "HE IS DISTRACTED"); }
     if (h == 385 || h == 3824) { set_response(g, "THEY SCURRY AWAY"); loc[g->noun] = GONE; flagv[FLAGV_RATS_GONE] = 1; }
 }
@@ -757,7 +764,7 @@ static void do_say(Game *g) {
         set_response(g, "YOU MUST SAY THEM ONE BY ONE!");
         return;
     }
-    if (g->room != 47 || g->noun < NOUN_AWAKE || g->noun > NOUN_HELP || loc[NOUN_STONE_OF_DESTINY] != INVENTORY) return;
+    if (g->room != ROOM_SILVER_CHAMBER || g->noun < NOUN_AWAKE || g->noun > NOUN_HELP || loc[NOUN_STONE_OF_DESTINY] != INVENTORY) return;
     if (g->noun == NOUN_AWAKE && flagv[FLAGV_SAID_AWAKE] == 0) { set_response(g, "THE MOUNTAIN RUMBLES!"); flagv[FLAGV_SAID_AWAKE] = 1; return; }
     if (g->noun == NOUN_GUIDE && flagv[FLAGV_SAID_AWAKE] == 1 && flagv[FLAGV_SAID_GUIDE] == 0) { set_response(g, "TOWERS FALL DOWN!"); flagv[FLAGV_SAID_GUIDE] = 1; return; }
     if (g->noun == flagv[FLAGV_THIRD_WORD_SELECTOR] + NOUN_PROTECT && flagv[FLAGV_SAID_AWAKE] == 1 && flagv[FLAGV_SAID_GUIDE] == 1) { flagv[FLAGV_QUEST_COMPLETE] = 1; return; }
@@ -788,18 +795,18 @@ static void do_remove(Game *g) {
 static void do_tie(Game *g) {
     int h = hcode(g);
     if (g->noun == NOUN_SHEET || g->noun == NOUN_ROPE) set_response(g, "NOTHING TO TIE IT TO!");
-    if (h == 7214) { set_response(g, "IT IS TIED"); loc[NOUN_ROPE] = 72; flagv[FLAGV_ROPE_TIED_AT_WELL] = 1; }
-    if (h == 722) { set_response(g, "OK"); flagv[FLAGV_SHEET_TIED_AT_WELL] = 1; loc[NOUN_SHEET] = 72; }
+    if (h == 7214) { set_response(g, "IT IS TIED"); loc[NOUN_ROPE] = ROOM_TOP_OF_WELL; flagv[FLAGV_ROPE_TIED_AT_WELL] = 1; }
+    if (h == 722) { set_response(g, "OK"); flagv[FLAGV_SHEET_TIED_AT_WELL] = 1; loc[NOUN_SHEET] = ROOM_TOP_OF_WELL; }
 }
 
 static void do_climb(Game *g) {
     int h = hcode(g);
-    if (h == 1547 && flagv[FLAGV_VINE_GROWN] == 1) { set_response(g, "ALL RIGHT"); g->room = 16; }
+    if (h == 1547 && flagv[FLAGV_VINE_GROWN] == 1) { set_response(g, "ALL RIGHT"); g->room = ROOM_INSCRIBED_CAVERN; }
     if (g->noun == NOUN_ROPE || g->noun == NOUN_SHEET) set_response(g, "NOT ATTACHED TO ANYTHING!");
-    if (h == 5414 && loc[NOUN_ROPE] == 54) set_response(g, "YOU ARE AT THE TOP");
-    if (h == 7214 && flagv[FLAGV_ROPE_TIED_AT_WELL] == 1) { set_response(g, "GOING DOWN"); g->room = 71; }
-    if (h == 722 && flagv[FLAGV_SHEET_TIED_AT_WELL] == 1) { g->room = 71; set_response(g, "IT IS TORN"); loc[NOUN_SHEET] = GONE; flagv[FLAGV_SHEET_TIED_AT_WELL] = 0; }
-    if (h == 7114 && flagv[FLAGV_ROPE_TIED_AT_WELL] == 1) { loc[NOUN_ROPE] = 71; flagv[FLAGV_ROPE_TIED_AT_WELL] = 0; set_response(g, "IT FALLS DOWN-BUMP!"); }
+    if (h == 5414 && loc[NOUN_ROPE] == ROOM_HIGH_PINNACLE) set_response(g, "YOU ARE AT THE TOP");
+    if (h == 7214 && flagv[FLAGV_ROPE_TIED_AT_WELL] == 1) { set_response(g, "GOING DOWN"); g->room = ROOM_WELL_BOTTOM; }
+    if (h == 722 && flagv[FLAGV_SHEET_TIED_AT_WELL] == 1) { g->room = ROOM_WELL_BOTTOM; set_response(g, "IT IS TORN"); loc[NOUN_SHEET] = GONE; flagv[FLAGV_SHEET_TIED_AT_WELL] = 0; }
+    if (h == 7114 && flagv[FLAGV_ROPE_TIED_AT_WELL] == 1) { loc[NOUN_ROPE] = ROOM_WELL_BOTTOM; flagv[FLAGV_ROPE_TIED_AT_WELL] = 0; set_response(g, "IT FALLS DOWN-BUMP!"); }
 }
 
 static void do_use(Game *g) {
@@ -821,7 +828,7 @@ static void do_open(Game *g) {
     if (h == 2030) { flagv[FLAGV_PHIAL_HIDDEN] = 0; set_response(g, "OK"); }
     if (h == 6030) { set_response(g, "OK"); flagv[FLAGV_BOOTS_HIDDEN] = 0; }
     if (h == 2444 || h == 1870) set_response(g, "YOU ARE NOT STRONG ENOUGH");
-    if (h == 3756) { set_response(g, "A PASSAGE!"); strcpy(exits[37], "EW"); }
+    if (h == 3756) { set_response(g, "A PASSAGE!"); strcpy(exits[ROOM_ROW_OF_CASKS], "EW"); }
     if (h == 5960) {
         char input[64];
         set_response(g, "WHAT IS THE CODE");
@@ -849,7 +856,7 @@ static void do_light(Game *g) {
 
 static void do_fill(Game *g) {
     int h = hcode(g);
-    if ((g->noun == NOUN_JUG || g->noun == NOUN_BUCKET) && (g->room == 41 || g->room == 51)) {
+    if ((g->noun == NOUN_JUG || g->noun == NOUN_BUCKET) && (g->room == ROOM_ROUGH_WATER || g->room == ROOM_MIDDLE_OF_LAKE)) {
         set_response(g, "YOU CAPSIZED!");
         flagv[FLAGV_PLAYER_DEAD] = 1;
     }
@@ -858,7 +865,7 @@ static void do_fill(Game *g) {
 }
 
 static void do_plant(Game *g) {
-    if (g->noun != NOUN_SEEDS || g->room != 15) {
+    if (g->noun != NOUN_SEEDS || g->room != ROOM_HIGH_WALLED_GARDEN) {
         set_response(g, "DOES NOT GROW!");
         return;
     }
@@ -877,8 +884,8 @@ static void do_break(Game *g) {
     int h = hcode(g);
     if (g->noun == NOUN_AXE || g->noun == NOUN_SWORD) set_response(g, "THWACK!");
     if (h == 5818) { set_response(g, "YOU CLEARED THE WEBS"); flagv[FLAGV_COBWEBS_CLEARED] = 1; }
-    if (h == 187) { set_response(g, "THE DOOR BROKE!"); strcpy(exits[18], "NS"); strcpy(exits[28], "NS"); }
-    if (h == 717) { set_response(g, "YOU BROKE THROUGH"); strcpy(exits[71], "N"); }
+    if (h == 187) { set_response(g, "THE DOOR BROKE!"); strcpy(exits[ROOM_DANK_CORRIDOR], "NS"); strcpy(exits[ROOM_DUNGEONS], "NS"); }
+    if (h == 717) { set_response(g, "YOU BROKE THROUGH"); strcpy(exits[ROOM_WELL_BOTTOM], "N"); }
 }
 
 static void do_swing(Game *g) {
@@ -888,12 +895,12 @@ static void do_swing(Game *g) {
 
 static void do_enter(Game *g) {
     if (hcode(g) == 4337) { g->verb = 2; do_move_direction(g); return; }
-    if (g->room == 36) { set_response(g, "YOU FOUND SOMETHING"); flagv[FLAGV_PLANKS_HIDDEN] = 0; }
+    if (g->room == ROOM_MOUNTAIN_HUT) { set_response(g, "YOU FOUND SOMETHING"); flagv[FLAGV_PLANKS_HIDDEN] = 0; }
 }
 
 static void do_cross(Game *g) {
-    if (g->room == 76) { g->verb = 4; do_move_direction(g); return; }
-    if (g->room == 75) { g->verb = 2; do_move_direction(g); }
+    if (g->room == ROOM_BRIDGE_EAST_END) { g->verb = 4; do_move_direction(g); return; }
+    if (g->room == ROOM_BRIDGE_WEST_END) { g->verb = 2; do_move_direction(g); }
 }
 
 static void do_rig(Game *g) {
@@ -908,7 +915,7 @@ static void do_turn(Game *g) {
 }
 
 static void do_dive(Game *g) {
-    if (g->room == 14 || g->room == 51) {
+    if (g->room == ROOM_MISTY_POOL || g->room == ROOM_MIDDLE_OF_LAKE) {
         set_response(g, "YOU HAVE DROWNED");
         flagv[FLAGV_PLAYER_DEAD] = 1;
     }
@@ -954,7 +961,7 @@ static void do_blow(Game *g) {
     if (g->noun == NOUN_REEDS) set_response(g, "A NICE TUNE");
     if (h == 5233) set_response(g, "WHAT WITH?");
     if (g->noun == NOUN_MUSIC) set_response(g, "HOW, O MUSICAL ONE?");
-    if (h == 5610) { flagv[FLAGV_GHOST_FREED] = 1; set_response(g, "THE GHOST OF THE GOBLIN GUARDIAN IS FREE!"); strcpy(exits[56], "NS"); }
+    if (h == 5610) { flagv[FLAGV_GHOST_FREED] = 1; set_response(g, "THE GHOST OF THE GOBLIN GUARDIAN IS FREE!"); strcpy(exits[ROOM_HUGE_FALLEN_OAK], "NS"); }
 }
 
 static void do_eat(Game *g) {
@@ -964,13 +971,13 @@ static void do_eat(Game *g) {
 
 static void do_move(Game *g) {
     int h = hcode(g);
-    if (g->room == 4 && g->noun == NOUN_RUBBLE) { flagv[FLAGV_RUBBLE_MOVED] = 1; set_response(g, "YOU REVEALED A STEEP PASSAGE"); }
-    if (g->room == 3 && g->noun == NOUN_RUBBLE) set_response(g, "YOU CANNOT MOVE RUBBLE FROM HERE");
+    if (g->room == ROOM_STALACTITES_AND_STALAGMITES && g->noun == NOUN_RUBBLE) { flagv[FLAGV_RUBBLE_MOVED] = 1; set_response(g, "YOU REVEALED A STEEP PASSAGE"); }
+    if (g->room == ROOM_HALLOW_TOMB && g->noun == NOUN_RUBBLE) set_response(g, "YOU CANNOT MOVE RUBBLE FROM HERE");
     if (h == 7136) set_response(g, "THEY ARE WEDGED IN!");
 }
 
 static void do_into_or_poison(Game *g) {
-    if ((g->noun == NOUN_GOBLET || g->noun == NOUN_WINE) && loc[NOUN_PHIAL] == INVENTORY && g->room == 49) {
+    if ((g->noun == NOUN_GOBLET || g->noun == NOUN_WINE) && loc[NOUN_PHIAL] == INVENTORY && g->room == ROOM_MOSAIC_HALL) {
         set_response(g, "OK");
         flagv[FLAGV_POISON_PLACED] = 1;
     }
@@ -979,7 +986,7 @@ static void do_into_or_poison(Game *g) {
 static void do_ring(Game *g) {
     char input[64];
     int mr;
-    if (g->room != 27 || g->noun != NOUN_BELL) return;
+    if (g->room != ROOM_SILVER_BELL || g->noun != NOUN_BELL) return;
     do {
         printf("\nHOW MANY TIMES?\n");
         if (!read_input(input, sizeof(input))) return;
@@ -988,7 +995,7 @@ static void do_ring(Game *g) {
     } while (mr == 0);
     if (mr == flagv[FLAGV_BELL_RING_COUNT]) {
         set_response(g, "A ROCK DOOR OPENS");
-        strcpy(exits[27], "EW");
+        strcpy(exits[ROOM_SILVER_BELL], "EW");
         return;
     }
     set_response(g, "YOU HAVE MISTREATED THE BELL!");
@@ -1028,7 +1035,7 @@ static void do_break_verb(Game *g) {
 }
 
 static void do_reflect_verb(Game *g) {
-    if (g->room == 48) set_response(g, "HOW?");
+    if (g->room == ROOM_WIZARDS_LAIR) set_response(g, "HOW?");
 }
 
 static void dispatch(Game *g) {
@@ -1039,12 +1046,12 @@ static void dispatch(Game *g) {
             return;
         }
     }
-    if (g->room == 56 && flagv[FLAGV_GHOST_FREED] == 0 && g->verb != 37 && g->verb != 53) {
+    if (g->room == ROOM_HUGE_FALLEN_OAK && flagv[FLAGV_GHOST_FREED] == 0 && g->verb != 37 && g->verb != 53) {
         set_response(g, "THE GHOST OF THE GOBLIN GUARDIAN HAS GOT YOU!");
         return;
     }
     if (!(g->verb == 44 || g->verb == 47 || g->verb == 19 || g->verb == 57 || g->verb == 49)) {
-        if (g->room == 48 && flagv[FLAGV_WIZARD_DEFEATED] == 0) {
+        if (g->room == ROOM_WIZARDS_LAIR && flagv[FLAGV_WIZARD_DEFEATED] == 0) {
             set_response(g, "THE WIZARD HAS YOU IN HIS GLARE");
             return;
         }
@@ -1140,14 +1147,14 @@ static void after_turn(Game *g) {
         g->running = 0;
         return;
     }
-    if (g->room == 41) {
+    if (g->room == ROOM_ROUGH_WATER) {
         flagv[FLAGV_ROUGH_WATER_TURN_COUNTER]++;
         if (flagv[FLAGV_ROUGH_WATER_TURN_COUNTER] == 10) {
             flagv[FLAGV_PLAYER_DEAD] = 1;
             set_response(g, "YOU SANK!");
         }
     }
-    if (g->room == 56 && flagv[FLAGV_GHOST_FREED] == 0 && loc[NOUN_REEDS] != INVENTORY) {
+    if (g->room == ROOM_HUGE_FALLEN_OAK && flagv[FLAGV_GHOST_FREED] == 0 && loc[NOUN_REEDS] != INVENTORY) {
         set_response(g, "THE GHOST OF THE GOBLIN GUARDIAN GETS YOU!");
         flagv[FLAGV_PLAYER_DEAD] = 1;
     }
