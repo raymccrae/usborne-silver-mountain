@@ -1744,6 +1744,34 @@ static int ui_modal_input(const char *title_text, const char *prompt, const char
     }
 }
 
+static int ui_confirm_exit(void) {
+    for (;;) {
+        int w = COLS < 48 ? COLS - 4 : 44;
+        int h = 7;
+        int y = (LINES - h) / 2;
+        int x = (COLS - w) / 2;
+        if (w < 28) w = COLS - 2;
+        if (y < 1) y = 1;
+        WINDOW *win = newwin(h, w, y, x);
+        keypad(win, TRUE);
+        box(win, 0, 0);
+        mvwhline(win, 2, 1, ACS_HLINE, w - 2);
+        mvwaddch(win, 2, 0, ACS_LTEE);
+        mvwaddch(win, 2, w - 1, ACS_RTEE);
+        wattron(win, A_BOLD);
+        mvwaddnstr(win, 1, 2, "Quit Game", w - 4);
+        wattroff(win, A_BOLD);
+        mvwaddnstr(win, 3, 2, "Are you sure you want to exit?", w - 4);
+        mvwaddnstr(win, 5, 2, "Y = quit    N/Esc = cancel", w - 4);
+        wmove(win, 5, 2);
+        wrefresh(win);
+        int ch = wgetch(win);
+        delwin(win);
+        if (ch == 'y' || ch == 'Y') return 1;
+        if (ch == 'n' || ch == 'N' || ch == 27 || ch == '\n' || ch == '\r' || ch == KEY_ENTER) return 0;
+    }
+}
+
 static int ui_prompt_line_impl(const char *prompt, char *buf, size_t size) {
     char out[256];
     int ok = ui_modal_input(prompt, "Answer:", "", out, sizeof(out));
@@ -1813,12 +1841,14 @@ static int curses_main(void) {
             if (input_len == 0) continue;
             snprintf(check, sizeof(check), "%s", input);
             uppercase_trim(check);
-            if (strcmp(check, "QUIT") == 0) {
+            if (strcmp(check, "QUIT") == 0 || strcmp(check, "EXIT") == 0) {
                 ui_add_command_event(input);
-                ui_add_event("BYE...");
-                break;
-            }
-            if (strcmp(check, "SAVE") == 0 || strcmp(check, "SAVE GAME") == 0) {
+                if (ui_confirm_exit()) {
+                    ui_add_event("BYE...");
+                    break;
+                }
+                ui_add_event("EXIT CANCELLED");
+            } else if (strcmp(check, "SAVE") == 0 || strcmp(check, "SAVE GAME") == 0) {
                 ui_add_command_event(input);
                 if (ui_modal_input("Save Game", "File name:", "silverm.sav", filename, sizeof(filename))) {
                     flagv[FLAGV_SAVED_ROOM] = game.room;
