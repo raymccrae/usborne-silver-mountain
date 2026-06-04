@@ -1772,6 +1772,63 @@ static int ui_confirm_exit(void) {
     }
 }
 
+static int ui_choose_start(Game *g) {
+    char status[128] = "";
+    for (;;) {
+        int w = COLS < 58 ? COLS - 4 : 54;
+        int h = 9;
+        int y = (LINES - h) / 2;
+        int x = (COLS - w) / 2;
+        if (w < 36) w = COLS - 2;
+        if (y < 1) y = 1;
+        erase();
+        box(stdscr, 0, 0);
+        attron(A_BOLD);
+        mvaddnstr(1, (COLS - 31) / 2, "THE MYSTERY OF SILVER MOUNTAIN", COLS - 2);
+        attroff(A_BOLD);
+
+        WINDOW *win = newwin(h, w, y, x);
+        keypad(win, TRUE);
+        box(win, 0, 0);
+        mvwhline(win, 2, 1, ACS_HLINE, w - 2);
+        mvwaddch(win, 2, 0, ACS_LTEE);
+        mvwaddch(win, 2, w - 1, ACS_RTEE);
+        wattron(win, A_BOLD);
+        mvwaddnstr(win, 1, 2, "Start Game", w - 4);
+        wattroff(win, A_BOLD);
+        mvwaddnstr(win, 3, 2, "1. Start a new game", w - 4);
+        mvwaddnstr(win, 4, 2, "2. Continue a saved game", w - 4);
+        mvwaddnstr(win, 6, 2, "Press 1 or 2    Esc = exit", w - 4);
+        if (status[0]) {
+            mvwaddnstr(win, 7, 2, status, w - 4);
+        }
+        wrefresh(win);
+        int ch = wgetch(win);
+        delwin(win);
+        if (ch == '1') {
+            new_game(g);
+            return 1;
+        }
+        if (ch == '2') {
+            char filename[256];
+            if (ui_modal_input("Load Game", "File name:", "silverm.sav", filename, sizeof(filename))) {
+                if (load_game(g, filename)) {
+                    return 1;
+                }
+                snprintf(status, sizeof(status), "Could not load that file.");
+            } else {
+                snprintf(status, sizeof(status), "Load cancelled.");
+            }
+        } else if (ch == 27) {
+            return 0;
+        } else if (ch == KEY_RESIZE) {
+            continue;
+        } else {
+            snprintf(status, sizeof(status), "Type 1 or 2.");
+        }
+    }
+}
+
 static int ui_prompt_line_impl(const char *prompt, char *buf, size_t size) {
     char out[256];
     int ok = ui_modal_input(prompt, "Answer:", "", out, sizeof(out));
@@ -1808,7 +1865,6 @@ static int curses_main(void) {
     int input_len = 0;
     srand((unsigned int)time(NULL));
     memset(&game, 0, sizeof(game));
-    new_game(&game);
 
     setlocale(LC_ALL, "");
     initscr();
@@ -1820,6 +1876,12 @@ static int curses_main(void) {
     scrollok(stdscr, FALSE);
     if (has_colors()) {
         start_color();
+    }
+    if (!ui_choose_start(&game)) {
+        endwin();
+        curses_active = 0;
+        ui_read_line = NULL;
+        return 0;
     }
     ui_add_event(game.response);
 
