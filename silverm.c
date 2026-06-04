@@ -13,6 +13,12 @@
 #define GONE 81
 #define LINE_LEN 39
 
+#if defined(__GNUC__)
+#define SILVERM_UNUSED __attribute__((unused))
+#else
+#define SILVERM_UNUSED
+#endif
+
 typedef struct {
     int x;
     int y;
@@ -140,6 +146,11 @@ static int loc[CARRIED_OBJECTS + 1];
 static int flagv[FLAG_COUNT + 1];
 static char exits[ROOM_COUNT + 1][8];
 static char maze_path[2][16];
+static FILE *game_input;
+
+static char *read_input(char *buf, size_t size) {
+    return fgets(buf, (int)size, game_input ? game_input : stdin);
+}
 
 static void set_response(Game *g, const char *s) {
     snprintf(g->response, sizeof(g->response), "%s", s);
@@ -160,7 +171,7 @@ static void title(void) {
 static void wait_return(void) {
     char buf[32];
     puts("PRESS RETURN TO CONTINUE");
-    (void)fgets(buf, sizeof(buf), stdin);
+    (void)read_input(buf, sizeof(buf));
 }
 
 static void wrap_print(const char *s) {
@@ -205,6 +216,9 @@ static void uppercase_trim(char *s) {
 }
 
 static int hcode(const Game *g) {
+    if (g->noun < 10) {
+        return g->room * 10 + g->noun;
+    }
     return g->room * 100 + g->noun;
 }
 
@@ -320,7 +334,7 @@ static int load_game(Game *g, const char *name) {
 
 static int ask_filename(char *name, size_t size) {
     printf("\nPLEASE ENTER FILE NAME\n");
-    if (!fgets(name, size, stdin)) {
+    if (!read_input(name, size)) {
         return 0;
     }
     size_t n = strlen(name);
@@ -330,7 +344,7 @@ static int ask_filename(char *name, size_t size) {
     return n > 0;
 }
 
-static void describe_room(const Game *g) {
+static void SILVERM_UNUSED describe_room(const Game *g) {
     char line[2048];
     title();
     snprintf(line, sizeof(line), "%s. YOU ARE %s %s %s ", g->response,
@@ -455,7 +469,7 @@ static void do_tunnel_maze(Game *g, int d) {
             puts("(OR G TO GIVE UP!)");
         }
         putchar('\n');
-        if (!fgets(input, sizeof(input), stdin)) {
+        if (!read_input(input, sizeof(input))) {
             flagv[56] = 1;
             return;
         }
@@ -804,7 +818,7 @@ static void do_open(Game *g) {
         char input[64];
         set_response(g, "WHAT IS THE CODE");
         puts(g->response);
-        if (fgets(input, sizeof(input), stdin) && atoi(input) == flagv[41]) {
+        if (read_input(input, sizeof(input)) && atoi(input) == flagv[41]) {
             set_response(g, "IT OPENS");
             flagv[21] = 0;
         } else {
@@ -960,7 +974,7 @@ static void do_ring(Game *g) {
     if (g->room != 27 || g->noun != 63) return;
     do {
         printf("\nHOW MANY TIMES?\n");
-        if (!fgets(input, sizeof(input), stdin)) return;
+        if (!read_input(input, sizeof(input))) return;
         mr = atoi(input);
         if (mr == 0) puts("A NUMBER");
     } while (mr == 0);
@@ -1082,7 +1096,7 @@ static void do_drink(Game *g) {
     set_response(g, "ARE YOU THIRSTY?");
 }
 
-static int choose_start(Game *g) {
+static int SILVERM_UNUSED choose_start(Game *g) {
     char input[64], filename[256];
     for (;;) {
         title();
@@ -1090,7 +1104,7 @@ static int choose_start(Game *g) {
         puts("   1. START A NEW GAME");
         puts("OR 2. CONTINUE A SAVED GAME\n");
         puts("TYPE IN EITHER 1 OR 2");
-        if (!fgets(input, sizeof(input), stdin)) return 0;
+        if (!read_input(input, sizeof(input))) return 0;
         if (atoi(input) == 1) {
             new_game(g);
             return 1;
@@ -1139,6 +1153,7 @@ static void after_turn(Game *g) {
     }
 }
 
+#ifndef SILVERM_TEST
 int main(void) {
     Game game;
     char input[256], filename[256];
@@ -1151,7 +1166,7 @@ int main(void) {
         describe_room(&game);
         set_response(&game, "PARDON?");
         puts("WHAT WILL YOU DO NOW ");
-        if (!fgets(input, sizeof(input), stdin)) break;
+        if (!read_input(input, sizeof(input))) break;
         char savecheck[256];
         snprintf(savecheck, sizeof(savecheck), "%s", input);
         uppercase_trim(savecheck);
@@ -1174,3 +1189,4 @@ int main(void) {
     }
     return 0;
 }
+#endif
