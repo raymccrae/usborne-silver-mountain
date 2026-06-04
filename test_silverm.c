@@ -77,10 +77,10 @@ static void run_problem_checks(void) {
     g.room = 80;
     command(&g, "EXAMINE POT");
     command(&g, "GET COINS");
-    check(loc[1] == INVENTORY && flagv[FLAGV_COIN_COUNT] == 4, "getting coins gives four coins");
+    check(loc[NOUN_COINS] == INVENTORY && flagv[FLAGV_COIN_COUNT] == 4, "getting coins gives four coins");
     snprintf(filename, sizeof(filename), "/tmp/silverm-test-save-%ld.sav", (long)getpid());
     check(save_game(&g, filename), "save_game succeeds");
-    check(flagv[FLAGV_COIN_COUNT] == 4 && loc[1] == INVENTORY, "saving does not lose coins");
+    check(flagv[FLAGV_COIN_COUNT] == 4 && loc[NOUN_COINS] == INVENTORY, "saving does not lose coins");
     remove(filename);
 
     deterministic_new_game(&g);
@@ -89,7 +89,7 @@ static void run_problem_checks(void) {
     command(&g, "GET COINS");
     g.room = 75;
     command(&g, "GIVE COIN");
-    check(flagv[FLAGV_COIN_COUNT] == 3 && loc[1] == INVENTORY, "GIVE COIN spends one coin");
+    check(flagv[FLAGV_COIN_COUNT] == 3 && loc[NOUN_COINS] == INVENTORY, "GIVE COIN spends one coin");
 
     deterministic_new_game(&g);
     g.room = 80;
@@ -97,7 +97,7 @@ static void run_problem_checks(void) {
     command(&g, "GET COINS");
     g.room = 75;
     command(&g, "GIVE COINS");
-    check(flagv[FLAGV_COIN_COUNT] == 0 && loc[1] == GONE, "GIVE COINS keeps original all-coins behavior");
+    check(flagv[FLAGV_COIN_COUNT] == 0 && loc[NOUN_COINS] == GONE, "GIVE COINS keeps original all-coins behavior");
 
     deterministic_new_game(&g);
     g.room = 60;
@@ -110,15 +110,15 @@ static void run_problem_checks(void) {
     command(&g, "E");
     command(&g, "W");
     command(&g, "E");
-    check(flagv[FLAGV_BOOTS_WORN] == 0 && loc[3] == GONE, "boots wear out after too many moves");
+    check(flagv[FLAGV_BOOTS_WORN] == 0 && loc[NOUN_BOOTS] == GONE, "boots wear out after too many moves");
 
     deterministic_new_game(&g);
     g.room = 80;
     command(&g, "GET COINS");
-    check(flagv[FLAGV_COINS_HIDDEN] == 1 && loc[1] == 80, "coins are hidden before examining pot");
+    check(flagv[FLAGV_COINS_HIDDEN] == 1 && loc[NOUN_COINS] == 80, "coins are hidden before examining pot");
     command(&g, "EXAMINE POT");
     command(&g, "GET COINS");
-    check(flagv[FLAGV_COINS_HIDDEN] == 0 && loc[1] == INVENTORY, "examining pot reveals coins");
+    check(flagv[FLAGV_COINS_HIDDEN] == 0 && loc[NOUN_COINS] == INVENTORY, "examining pot reveals coins");
 }
 
 static void run_full_playthrough(void) {

@@ -423,7 +423,7 @@ static int find_noun(const char *noun) {
 static void parse_command(Game *g, char *input) {
     char *space;
     g->verb = 0;
-    g->noun = 0;
+    g->noun = NOUN_NONE;
     g->verb_text[0] = '\0';
     g->noun_text[0] = '\0';
     uppercase_trim(input);
@@ -523,15 +523,15 @@ static void do_move_direction(Game *g) {
             return;
         }
     }
-    if (loc[8] == INVENTORY && ((g->room == 52 && d == 2) || (g->room == 31 && d != 3))) {
+    if (loc[NOUN_BOAT] == INVENTORY && ((g->room == 52 && d == 2) || (g->room == 31 && d != 3))) {
         set_response(g, "THE BOAT IS TOO HEAVY");
         return;
     }
-    if (loc[8] != INVENTORY && ((g->room == 52 && d == 4) || (g->room == 31 && d == 3))) {
+    if (loc[NOUN_BOAT] != INVENTORY && ((g->room == 52 && d == 4) || (g->room == 31 && d == 3))) {
         set_response(g, "YOU CANNOT SWIM");
         return;
     }
-    if (g->room == 52 && loc[8] == INVENTORY && d == 4 && flagv[FLAGV_BOAT_POWERED] == 0) {
+    if (g->room == 52 && loc[NOUN_BOAT] == INVENTORY && d == 4 && flagv[FLAGV_BOAT_POWERED] == 0) {
         set_response(g, "NO POWER!");
         return;
     }
@@ -547,7 +547,7 @@ static void do_move_direction(Game *g) {
         set_response(g, "A PILE OF RUBBLE BLOCKS YOUR PATH");
         return;
     }
-    if (g->room == 35 && loc[13] != g->room) {
+    if (g->room == 35 && loc[NOUN_PLANKS] != g->room) {
         set_response(g, "THE ICE IS BREAKING!");
         return;
     }
@@ -614,7 +614,7 @@ static void do_move_direction(Game *g) {
     if (flagv[FLAGV_BOOT_WEAR_COUNTER] > 5 && flagv[FLAGV_BOOTS_WORN] == 1) {
         set_response(g, "BOOTS HAVE WORN OUT");
         flagv[FLAGV_BOOTS_WORN] = 0;
-        loc[3] = GONE;
+        loc[NOUN_BOOTS] = GONE;
     }
 }
 
@@ -623,7 +623,7 @@ static void do_inventory(Game *g) {
     set_response(g, "OK");
     printf("YOU HAVE ");
     for (int i = 1; i <= CARRIED_OBJECTS; i++) {
-        if (i == CARRIED_OBJECTS && loc[5] == INVENTORY) {
+        if (i == CARRIED_OBJECTS && loc[NOUN_APPLES] == INVENTORY) {
             continue;
         }
         if (loc[i] == INVENTORY) {
@@ -645,15 +645,15 @@ static void do_get(Game *g) {
         return;
     }
     if (h == 4177 || h == 5177) {
-        g->noun = 16;
+        g->noun = NOUN_JUG;
         do_fill(g);
         return;
     }
-    if (g->noun == 38) {
+    if (g->noun == NOUN_SACKS) {
         set_response(g, "TOO HEAVY!");
         return;
     }
-    if (g->noun == 4 && flagv[FLAGV_HORSESHOE_LOOSENED] == 0) {
+    if (g->noun == NOUN_HORSESHOE && flagv[FLAGV_HORSESHOE_LOOSENED] == 0) {
         set_response(g, "IT IS FIRMLY NAILED ON!");
         return;
     }
@@ -669,7 +669,7 @@ static void do_get(Game *g) {
         snprintf(g->response, sizeof(g->response), "YOU CANNOT GET THE %s", g->noun_text);
         return;
     }
-    if (g->noun == 0) return;
+    if (g->noun == NOUN_NONE) return;
     if (loc[g->noun] != g->room) set_response(g, "IT IS NOT HERE!");
     if (flagv[g->noun] == 1) {
         snprintf(g->response, sizeof(g->response), "WHAT %s?", g->noun_text);
@@ -679,32 +679,32 @@ static void do_get(Game *g) {
         loc[g->noun] = INVENTORY;
         snprintf(g->response, sizeof(g->response), "YOU HAVE THE %s", g->noun_text);
     }
-    if (g->noun == 28) loc[5] = GONE;
-    if (g->noun == 5) loc[28] = INVENTORY;
-    if (loc[4] == INVENTORY && loc[12] == INVENTORY && loc[15] == INVENTORY) flagv[FLAGV_CHARM_TRIO_ASSEMBLED] = 1;
-    if (g->noun == 8 && flagv[FLAGV_BOAT_POWERED] == 1) loc[2] = INVENTORY;
-    if (g->noun == 2) flagv[FLAGV_BOAT_POWERED] = 0;
+    if (g->noun == NOUN_APPLE) loc[NOUN_APPLES] = GONE;
+    if (g->noun == NOUN_APPLES) loc[NOUN_APPLE] = INVENTORY;
+    if (loc[NOUN_HORSESHOE] == INVENTORY && loc[NOUN_SHIELD] == INVENTORY && loc[NOUN_RING] == INVENTORY) flagv[FLAGV_CHARM_TRIO_ASSEMBLED] = 1;
+    if (g->noun == NOUN_BOAT && flagv[FLAGV_BOAT_POWERED] == 1) loc[NOUN_SHEET] = INVENTORY;
+    if (g->noun == NOUN_SHEET) flagv[FLAGV_BOAT_POWERED] = 0;
 }
 
 static void do_examine(Game *g) {
     int h = hcode(g);
     set_response(g, "YOU SEE WHAT YOU MIGHT EXPECT!");
-    if (g->noun > 0) set_response(g, "NOTHING SPECIAL");
-    if (g->noun == 46 || g->noun == 88) do_enter(g);
+    if (g->noun > NOUN_NONE) set_response(g, "NOTHING SPECIAL");
+    if (g->noun == NOUN_HUT || g->noun == NOUN_MOUNTAIN_HUT) do_enter(g);
     if (h == 8076) set_response(g, "IT IS EMPTY");
     if (h == 8080) { set_response(g, "AHA!"); flagv[FLAGV_COINS_HIDDEN] = 0; }
     if (h == 7029) { set_response(g, "OK"); flagv[FLAGV_SHEET_HIDDEN] = 0; }
-    if (g->noun == 20) { set_response(g, "MATCHES IN POCKET"); loc[26] = INVENTORY; }
+    if (g->noun == NOUN_UNIFORM) { set_response(g, "MATCHES IN POCKET"); loc[NOUN_MATCHES] = INVENTORY; }
     if (h == 1648) snprintf(g->response, sizeof(g->response), "THERE ARE SOME LETTERS '%s'", maze_path[1]);
     if (h == 7432) { set_response(g, "THEY ARE APPLE TREES"); flagv[FLAGV_APPLES_HIDDEN] = 0; }
     if (h == 2134 || h == 2187) { set_response(g, "OK"); flagv[FLAGV_JUG_HIDDEN] = 0; }
-    if (g->noun == 35) { set_response(g, "IT IS FISHY!"); flagv[FLAGV_NET_HIDDEN] = 0; }
+    if (g->noun == NOUN_KETCH) { set_response(g, "IT IS FISHY!"); flagv[FLAGV_NET_HIDDEN] = 0; }
     if (h == 3438) { set_response(g, "OK"); flagv[FLAGV_SEEDS_HIDDEN] = 0; }
     if (h == 242) set_response(g, "A FADED INSCRIPTION");
     if ((h == 1443 || h == 1485) && flagv[FLAGV_POOL_EMPTIED] == 0) set_response(g, "A GLIMMERING FROM THE DEPTHS");
     if ((h == 1443 || h == 1485) && flagv[FLAGV_POOL_EMPTIED] == 1) { set_response(g, "SOMETHING HERE..."); flagv[FLAGV_SHIELD_HIDDEN] = 0; }
     if (h == 2479 || h == 2444) set_response(g, "THERE IS A HANDLE");
-    if (g->noun == 9) set_response(g, "THE LABEL READS 'POISON'");
+    if (g->noun == NOUN_PHIAL) set_response(g, "THE LABEL READS 'POISON'");
     if (h == 4055) {
         int r = flagv[flagv[FLAGV_THIRD_WORD_SELECTOR] + FLAGV_THIRD_WORD_ROOM_PROTECT];
         snprintf(g->response, sizeof(g->response), "MAGIC WORDS LIE AT THE CROSSROADS, THE FOUNTAIN AND THE %s", rooms[r].name);
@@ -712,7 +712,7 @@ static void do_examine(Game *g) {
     if (h == 2969 && flagv[FLAGV_GRARG_SLEEPING] == 1) set_response(g, "VERY UGLY!");
     if (h == 7158 || h == 7186) set_response(g, "THERE ARE LOOSE BRICKS");
     if (g->room == 49) set_response(g, "VERY INTERESTING!");
-    if (g->noun == 52 || g->noun == 82 || g->noun == 81) set_response(g, "INTERESTING!");
+    if (g->noun == NOUN_FOUNTAIN || g->noun == NOUN_PINNACLE || g->noun == NOUN_STATUE) set_response(g, "INTERESTING!");
     if (h == 6978) set_response(g, "THERE IS A WOODEN DOOR");
     if (h == 6970) { set_response(g, "YOU FOUND SOMETHING"); flagv[FLAGV_HORSESHOE_HIDDEN] = 0; }
     if (h == 2066) set_response(g, "A LARGE CUPBOARD IN THE CORNER");
@@ -725,27 +725,27 @@ static void do_give(Game *g) {
     if (g->room == 64) set_response(g, "HE GIVES IT BACK!");
     if (h == 6425) {
         snprintf(g->response, sizeof(g->response), "HE TAKES IT AND SAYS '%d RINGS ARE NEEDED'", flagv[FLAGV_BELL_RING_COUNT]);
-        loc[25] = GONE;
+        loc[NOUN_BROOCH] = GONE;
     }
     if (g->room == 75 || g->room == 76) set_response(g, "HE DOES NOT WANT IT");
-    if (g->noun == 62 && flagv[FLAGV_COIN_COUNT] == 0) set_response(g, "YOU HAVE RUN OUT!");
-    if ((h == 7562 || h == 7662) && flagv[FLAGV_COIN_COUNT] > 0 && loc[1] == INVENTORY) {
+    if (g->noun == NOUN_COIN && flagv[FLAGV_COIN_COUNT] == 0) set_response(g, "YOU HAVE RUN OUT!");
+    if ((h == 7562 || h == 7662) && flagv[FLAGV_COIN_COUNT] > 0 && loc[NOUN_COINS] == INVENTORY) {
         set_response(g, "HE TAKES IT");
         flagv[FLAGV_TROLL_TOLL_PAID] = 1;
     }
     if (flagv[FLAGV_TROLL_TOLL_PAID] == 1) {
         flagv[FLAGV_COIN_COUNT]--;
-        if (flagv[FLAGV_COIN_COUNT] == 0) loc[1] = GONE;
+        if (flagv[FLAGV_COIN_COUNT] == 0) loc[NOUN_COINS] = GONE;
     }
-    if (g->noun == 1) {
+    if (g->noun == NOUN_COINS) {
         set_response(g, "HE TAKES THEM ALL!");
-        loc[1] = GONE;
+        loc[NOUN_COINS] = GONE;
         flagv[FLAGV_TROLL_TOLL_PAID] = 1;
         flagv[FLAGV_COIN_COUNT] = 0;
     }
-    if (h == 2228 && loc[5] == GONE) { append_response(g, "HE LEADS YOU ", "NORTH"); loc[28] = GONE; g->room = 12; }
-    if ((h == 2228 && loc[5] == INVENTORY) || h == 225) { append_response(g, "HE LEADS YOU ", "NORTH"); g->room = 12; }
-    if ((h == 1228 && loc[5] == INVENTORY) || h == 125) { append_response(g, "HE LEADS YOU ", "SOUTH"); g->room = 22; }
+    if (h == 2228 && loc[NOUN_APPLES] == GONE) { append_response(g, "HE LEADS YOU ", "NORTH"); loc[NOUN_APPLE] = GONE; g->room = 12; }
+    if ((h == 2228 && loc[NOUN_APPLES] == INVENTORY) || h == 225) { append_response(g, "HE LEADS YOU ", "NORTH"); g->room = 12; }
+    if ((h == 1228 && loc[NOUN_APPLES] == INVENTORY) || h == 125) { append_response(g, "HE LEADS YOU ", "SOUTH"); g->room = 22; }
     if (g->room == 7 || g->room == 33) { set_response(g, "HE EATS IT!"); loc[g->noun] = GONE; }
     if (h == 711) { flagv[FLAGV_HOUND_DISTRACTED] = 1; set_response(g, "HE IS DISTRACTED"); }
     if (h == 385 || h == 3824) { set_response(g, "THEY SCURRY AWAY"); loc[g->noun] = GONE; flagv[FLAGV_RATS_GONE] = 1; }
@@ -753,26 +753,26 @@ static void do_give(Game *g) {
 
 static void do_say(Game *g) {
     set_response(g, "YOU SAID IT");
-    if (g->noun == 84) {
+    if (g->noun == NOUN_MAGIC_WORDS) {
         set_response(g, "YOU MUST SAY THEM ONE BY ONE!");
         return;
     }
-    if (g->room != 47 || g->noun < 71 || g->noun > 75 || loc[27] != INVENTORY) return;
-    if (g->noun == 71 && flagv[FLAGV_SAID_AWAKE] == 0) { set_response(g, "THE MOUNTAIN RUMBLES!"); flagv[FLAGV_SAID_AWAKE] = 1; return; }
-    if (g->noun == 72 && flagv[FLAGV_SAID_AWAKE] == 1 && flagv[FLAGV_SAID_GUIDE] == 0) { set_response(g, "TOWERS FALL DOWN!"); flagv[FLAGV_SAID_GUIDE] = 1; return; }
-    if (g->noun == flagv[FLAGV_THIRD_WORD_SELECTOR] + 73 && flagv[FLAGV_SAID_AWAKE] == 1 && flagv[FLAGV_SAID_GUIDE] == 1) { flagv[FLAGV_QUEST_COMPLETE] = 1; return; }
+    if (g->room != 47 || g->noun < NOUN_AWAKE || g->noun > NOUN_HELP || loc[NOUN_STONE_OF_DESTINY] != INVENTORY) return;
+    if (g->noun == NOUN_AWAKE && flagv[FLAGV_SAID_AWAKE] == 0) { set_response(g, "THE MOUNTAIN RUMBLES!"); flagv[FLAGV_SAID_AWAKE] = 1; return; }
+    if (g->noun == NOUN_GUIDE && flagv[FLAGV_SAID_AWAKE] == 1 && flagv[FLAGV_SAID_GUIDE] == 0) { set_response(g, "TOWERS FALL DOWN!"); flagv[FLAGV_SAID_GUIDE] = 1; return; }
+    if (g->noun == flagv[FLAGV_THIRD_WORD_SELECTOR] + NOUN_PROTECT && flagv[FLAGV_SAID_AWAKE] == 1 && flagv[FLAGV_SAID_GUIDE] == 1) { flagv[FLAGV_QUEST_COMPLETE] = 1; return; }
     set_response(g, "THE WRONG SACRED WORD!");
     flagv[FLAGV_PLAYER_DEAD] = 1;
 }
 
 static void do_wear(Game *g) {
-    if (g->noun == 5 || g->noun == 10) do_get(g);
-    if (g->noun == 3) {
+    if (g->noun == NOUN_APPLES || g->noun == NOUN_REEDS) do_get(g);
+    if (g->noun == NOUN_BOOTS) {
         flagv[FLAGV_BOOTS_WORN] = 1;
         flagv[FLAGV_GRARG_PATROL_WARNING] = 0;
         set_response(g, "YOU ARE INVISIBLE");
     }
-    if (g->noun == 20) {
+    if (g->noun == NOUN_UNIFORM) {
         flagv[FLAGV_UNIFORM_WORN] = 1;
         flagv[FLAGV_GRARG_PATROL_WARNING] = 0;
         set_response(g, "YOU ARE DISGUISED");
@@ -780,44 +780,44 @@ static void do_wear(Game *g) {
 }
 
 static void do_remove(Game *g) {
-    if (g->noun == 3 && flagv[FLAGV_BOOTS_WORN] == 1) { set_response(g, "TAKEN OFF"); flagv[FLAGV_BOOTS_WORN] = 0; }
-    if (g->noun == 20 && flagv[FLAGV_UNIFORM_WORN] == 1) { set_response(g, "OK"); flagv[FLAGV_UNIFORM_WORN] = 0; }
-    if (g->noun == 36 || g->noun == 50) do_move(g);
+    if (g->noun == NOUN_BOOTS && flagv[FLAGV_BOOTS_WORN] == 1) { set_response(g, "TAKEN OFF"); flagv[FLAGV_BOOTS_WORN] = 0; }
+    if (g->noun == NOUN_UNIFORM && flagv[FLAGV_UNIFORM_WORN] == 1) { set_response(g, "OK"); flagv[FLAGV_UNIFORM_WORN] = 0; }
+    if (g->noun == NOUN_BRICKS || g->noun == NOUN_RUBBLE) do_move(g);
 }
 
 static void do_tie(Game *g) {
     int h = hcode(g);
-    if (g->noun == 2 || g->noun == 14) set_response(g, "NOTHING TO TIE IT TO!");
-    if (h == 7214) { set_response(g, "IT IS TIED"); loc[14] = 72; flagv[FLAGV_ROPE_TIED_AT_WELL] = 1; }
-    if (h == 722) { set_response(g, "OK"); flagv[FLAGV_SHEET_TIED_AT_WELL] = 1; loc[2] = 72; }
+    if (g->noun == NOUN_SHEET || g->noun == NOUN_ROPE) set_response(g, "NOTHING TO TIE IT TO!");
+    if (h == 7214) { set_response(g, "IT IS TIED"); loc[NOUN_ROPE] = 72; flagv[FLAGV_ROPE_TIED_AT_WELL] = 1; }
+    if (h == 722) { set_response(g, "OK"); flagv[FLAGV_SHEET_TIED_AT_WELL] = 1; loc[NOUN_SHEET] = 72; }
 }
 
 static void do_climb(Game *g) {
     int h = hcode(g);
     if (h == 1547 && flagv[FLAGV_VINE_GROWN] == 1) { set_response(g, "ALL RIGHT"); g->room = 16; }
-    if (g->noun == 14 || g->noun == 2) set_response(g, "NOT ATTACHED TO ANYTHING!");
-    if (h == 5414 && loc[14] == 54) set_response(g, "YOU ARE AT THE TOP");
+    if (g->noun == NOUN_ROPE || g->noun == NOUN_SHEET) set_response(g, "NOT ATTACHED TO ANYTHING!");
+    if (h == 5414 && loc[NOUN_ROPE] == 54) set_response(g, "YOU ARE AT THE TOP");
     if (h == 7214 && flagv[FLAGV_ROPE_TIED_AT_WELL] == 1) { set_response(g, "GOING DOWN"); g->room = 71; }
-    if (h == 722 && flagv[FLAGV_SHEET_TIED_AT_WELL] == 1) { g->room = 71; set_response(g, "IT IS TORN"); loc[2] = GONE; flagv[FLAGV_SHEET_TIED_AT_WELL] = 0; }
-    if (h == 7114 && flagv[FLAGV_ROPE_TIED_AT_WELL] == 1) { loc[14] = 71; flagv[FLAGV_ROPE_TIED_AT_WELL] = 0; set_response(g, "IT FALLS DOWN-BUMP!"); }
+    if (h == 722 && flagv[FLAGV_SHEET_TIED_AT_WELL] == 1) { g->room = 71; set_response(g, "IT IS TORN"); loc[NOUN_SHEET] = GONE; flagv[FLAGV_SHEET_TIED_AT_WELL] = 0; }
+    if (h == 7114 && flagv[FLAGV_ROPE_TIED_AT_WELL] == 1) { loc[NOUN_ROPE] = 71; flagv[FLAGV_ROPE_TIED_AT_WELL] = 0; set_response(g, "IT FALLS DOWN-BUMP!"); }
 }
 
 static void do_use(Game *g) {
     int h = hcode(g);
     if (h == 522) { set_response(g, "OK"); flagv[FLAGV_BOAT_POWERED] = 1; }
-    if (g->noun == 1 || g->noun == 62 || g->noun == 5 || g->noun == 28 || g->noun == 11 || g->noun == 24) do_give(g);
+    if (g->noun == NOUN_COINS || g->noun == NOUN_COIN || g->noun == NOUN_APPLES || g->noun == NOUN_APPLE || g->noun == NOUN_BONE || g->noun == NOUN_BREAD) do_give(g);
     if (h == 416) { set_response(g, "YOU HAVE KEPT AFLOAT"); flagv[FLAGV_BOAT_KEPT_AFLOAT] = 1; return; }
     if (h == 4116) { set_response(g, "IT IS NOT BIG ENOUGH!"); return; }
-    if (g->noun == 18 || g->noun == 7) do_break(g);
-    if (g->noun == 13) do_drop(g);
-    if (g->noun == 19) do_reflect(g);
-    if (g->noun == 10) do_blow(g);
-    if (g->noun == 16 || g->noun == 6) do_fill(g);
+    if (g->noun == NOUN_SWORD || g->noun == NOUN_AXE) do_break(g);
+    if (g->noun == NOUN_PLANKS) do_drop(g);
+    if (g->noun == NOUN_SILVER_PLATE) do_reflect(g);
+    if (g->noun == NOUN_REEDS) do_blow(g);
+    if (g->noun == NOUN_JUG || g->noun == NOUN_BUCKET) do_fill(g);
 }
 
 static void do_open(Game *g) {
     int h = hcode(g);
-    if (g->noun == 76 || g->noun == 38) do_examine(g);
+    if (g->noun == NOUN_CHEST || g->noun == NOUN_SACKS) do_examine(g);
     if (h == 2030) { flagv[FLAGV_PHIAL_HIDDEN] = 0; set_response(g, "OK"); }
     if (h == 6030) { set_response(g, "OK"); flagv[FLAGV_BOOTS_HIDDEN] = 0; }
     if (h == 2444 || h == 1870) set_response(g, "YOU ARE NOT STRONG ENOUGH");
@@ -840,25 +840,25 @@ static void do_open(Game *g) {
 static void do_light(Game *g) {
     int h = hcode(g);
     if (g->noun > CARRIED_OBJECTS) set_response(g, "IT DOES NOT BURN");
-    if (g->noun == 26) set_response(g, "YOU LIT THEM");
+    if (g->noun == NOUN_MATCHES) set_response(g, "YOU LIT THEM");
     if (h == 3826) set_response(g, "NOT BRIGHT ENOUGH");
-    if ((g->noun == 23 || h == 6970) && loc[26] != INVENTORY) set_response(g, "NO MATCHES");
-    if (g->noun == 23 && loc[26] == INVENTORY) { snprintf(g->response, sizeof(g->response), "A BRIGHT %s", g->verb_text); flagv[FLAGV_LAMP_LIT] = 1; }
-    if (h == 6970 && loc[26] == INVENTORY) { flagv[FLAGV_HORSESHOE_LOOSENED] = 1; set_response(g, "IT HAS TURNED TO ASHES"); }
+    if ((g->noun == NOUN_LAMP || h == 6970) && loc[NOUN_MATCHES] != INVENTORY) set_response(g, "NO MATCHES");
+    if (g->noun == NOUN_LAMP && loc[NOUN_MATCHES] == INVENTORY) { snprintf(g->response, sizeof(g->response), "A BRIGHT %s", g->verb_text); flagv[FLAGV_LAMP_LIT] = 1; }
+    if (h == 6970 && loc[NOUN_MATCHES] == INVENTORY) { flagv[FLAGV_HORSESHOE_LOOSENED] = 1; set_response(g, "IT HAS TURNED TO ASHES"); }
 }
 
 static void do_fill(Game *g) {
     int h = hcode(g);
-    if ((g->noun == 16 || g->noun == 6) && (g->room == 41 || g->room == 51)) {
+    if ((g->noun == NOUN_JUG || g->noun == NOUN_BUCKET) && (g->room == 41 || g->room == 51)) {
         set_response(g, "YOU CAPSIZED!");
         flagv[FLAGV_PLAYER_DEAD] = 1;
     }
-    if (h == 6516 && loc[16] == INVENTORY) { set_response(g, "IT IS NOW FULL"); flagv[FLAGV_JUG_FULL] = 1; }
+    if (h == 6516 && loc[NOUN_JUG] == INVENTORY) { set_response(g, "IT IS NOW FULL"); flagv[FLAGV_JUG_FULL] = 1; }
     if (h == 656) set_response(g, "IT LEAKS OUT!");
 }
 
 static void do_plant(Game *g) {
-    if (g->noun != 22 || g->room != 15) {
+    if (g->noun != NOUN_SEEDS || g->room != 15) {
         set_response(g, "DOES NOT GROW!");
         return;
     }
@@ -867,7 +867,7 @@ static void do_plant(Game *g) {
 }
 
 static void do_water(Game *g) {
-    if (g->noun == 22 && flagv[FLAGV_SEEDS_PLANTED] == 1 && flagv[FLAGV_JUG_FULL] == 1) {
+    if (g->noun == NOUN_SEEDS && flagv[FLAGV_SEEDS_PLANTED] == 1 && flagv[FLAGV_JUG_FULL] == 1) {
         set_response(g, "A LARGE VINE GROWS IN SECONDS!");
         flagv[FLAGV_VINE_GROWN] = 1;
     }
@@ -875,14 +875,14 @@ static void do_water(Game *g) {
 
 static void do_break(Game *g) {
     int h = hcode(g);
-    if (g->noun == 7 || g->noun == 18) set_response(g, "THWACK!");
+    if (g->noun == NOUN_AXE || g->noun == NOUN_SWORD) set_response(g, "THWACK!");
     if (h == 5818) { set_response(g, "YOU CLEARED THE WEBS"); flagv[FLAGV_COBWEBS_CLEARED] = 1; }
     if (h == 187) { set_response(g, "THE DOOR BROKE!"); strcpy(exits[18], "NS"); strcpy(exits[28], "NS"); }
     if (h == 717) { set_response(g, "YOU BROKE THROUGH"); strcpy(exits[71], "N"); }
 }
 
 static void do_swing(Game *g) {
-    if (g->noun == 16) { g->noun = 22; do_water(g); }
+    if (g->noun == NOUN_JUG) { g->noun = NOUN_SEEDS; do_water(g); }
     if (hcode(g) == 499) set_response(g, "WHERE?");
 }
 
@@ -920,27 +920,27 @@ static void do_bail(Game *g) {
 
 static void do_drop(Game *g) {
     int h = hcode(g);
-    if (g->noun == 0 || g->noun > CARRIED_OBJECTS) return;
+    if (g->noun == NOUN_NONE || g->noun > CARRIED_OBJECTS) return;
     loc[g->noun] = g->room;
     set_response(g, "DONE");
     if (h == 418 || h == 518) { set_response(g, "YOU DROWNED!"); flagv[FLAGV_PLAYER_DEAD] = 1; }
-    if (g->noun == 8 && flagv[FLAGV_BOAT_POWERED] == 1) loc[2] = g->room;
-    if (g->noun == 16 && flagv[FLAGV_JUG_FULL] == 1) { set_response(g, "YOU LOST THE WATER!"); flagv[FLAGV_JUG_FULL] = 0; }
-    if (g->noun == 2 && flagv[FLAGV_BOAT_POWERED] == 1) flagv[FLAGV_BOAT_POWERED] = 0;
+    if (g->noun == NOUN_BOAT && flagv[FLAGV_BOAT_POWERED] == 1) loc[NOUN_SHEET] = g->room;
+    if (g->noun == NOUN_JUG && flagv[FLAGV_JUG_FULL] == 1) { set_response(g, "YOU LOST THE WATER!"); flagv[FLAGV_JUG_FULL] = 0; }
+    if (g->noun == NOUN_SHEET && flagv[FLAGV_BOAT_POWERED] == 1) flagv[FLAGV_BOAT_POWERED] = 0;
 }
 
 static void do_insert(Game *g) {
-    if (g->noun == 62 && flagv[FLAGV_COIN_COUNT] == 0) set_response(g, "YOU DO NOT HAVE ANY");
-    if (hcode(g) == 5762 && loc[1] == INVENTORY && flagv[FLAGV_COIN_COUNT] > 0) {
+    if (g->noun == NOUN_COIN && flagv[FLAGV_COIN_COUNT] == 0) set_response(g, "YOU DO NOT HAVE ANY");
+    if (hcode(g) == 5762 && loc[NOUN_COINS] == INVENTORY && flagv[FLAGV_COIN_COUNT] > 0) {
         flagv[FLAGV_COIN_COUNT]--;
         snprintf(g->response, sizeof(g->response), "A NUMBER APPEARS - %d", flagv[FLAGV_SAFE_CODE]);
-        if (flagv[FLAGV_COIN_COUNT] == 0) loc[1] = GONE;
+        if (flagv[FLAGV_COIN_COUNT] == 0) loc[NOUN_COINS] = GONE;
     }
 }
 
 static void do_throw(Game *g) {
     int h = hcode(g);
-    if (g->noun == 0 || g->noun > CARRIED_OBJECTS) return;
+    if (g->noun == NOUN_NONE || g->noun > CARRIED_OBJECTS) return;
     set_response(g, "DID NOT GO FAR!");
     loc[g->noun] = g->room;
     if (h == 3317) {
@@ -951,26 +951,26 @@ static void do_throw(Game *g) {
 
 static void do_blow(Game *g) {
     int h = hcode(g);
-    if (g->noun == 10) set_response(g, "A NICE TUNE");
+    if (g->noun == NOUN_REEDS) set_response(g, "A NICE TUNE");
     if (h == 5233) set_response(g, "WHAT WITH?");
-    if (g->noun == 83) set_response(g, "HOW, O MUSICAL ONE?");
+    if (g->noun == NOUN_MUSIC) set_response(g, "HOW, O MUSICAL ONE?");
     if (h == 5610) { flagv[FLAGV_GHOST_FREED] = 1; set_response(g, "THE GHOST OF THE GOBLIN GUARDIAN IS FREE!"); strcpy(exits[56], "NS"); }
 }
 
 static void do_eat(Game *g) {
-    if (g->noun == 0 || g->noun > CARRIED_OBJECTS) return;
-    if (g->noun == 5 || g->noun == 24) { set_response(g, "YUM YUM!"); loc[g->noun] = GONE; }
+    if (g->noun == NOUN_NONE || g->noun > CARRIED_OBJECTS) return;
+    if (g->noun == NOUN_APPLES || g->noun == NOUN_BREAD) { set_response(g, "YUM YUM!"); loc[g->noun] = GONE; }
 }
 
 static void do_move(Game *g) {
     int h = hcode(g);
-    if (g->room == 4 && g->noun == 50) { flagv[FLAGV_RUBBLE_MOVED] = 1; set_response(g, "YOU REVEALED A STEEP PASSAGE"); }
-    if (g->room == 3 && g->noun == 50) set_response(g, "YOU CANNOT MOVE RUBBLE FROM HERE");
+    if (g->room == 4 && g->noun == NOUN_RUBBLE) { flagv[FLAGV_RUBBLE_MOVED] = 1; set_response(g, "YOU REVEALED A STEEP PASSAGE"); }
+    if (g->room == 3 && g->noun == NOUN_RUBBLE) set_response(g, "YOU CANNOT MOVE RUBBLE FROM HERE");
     if (h == 7136) set_response(g, "THEY ARE WEDGED IN!");
 }
 
 static void do_into_or_poison(Game *g) {
-    if ((g->noun == 67 || g->noun == 68) && loc[9] == INVENTORY && g->room == 49) {
+    if ((g->noun == NOUN_GOBLET || g->noun == NOUN_WINE) && loc[NOUN_PHIAL] == INVENTORY && g->room == 49) {
         set_response(g, "OK");
         flagv[FLAGV_POISON_PLACED] = 1;
     }
@@ -979,7 +979,7 @@ static void do_into_or_poison(Game *g) {
 static void do_ring(Game *g) {
     char input[64];
     int mr;
-    if (g->room != 27 || g->noun != 63) return;
+    if (g->room != 27 || g->noun != NOUN_BELL) return;
     do {
         printf("\nHOW MANY TIMES?\n");
         if (!read_input(input, sizeof(input))) return;
@@ -997,27 +997,27 @@ static void do_ring(Game *g) {
 
 static void do_cut(Game *g) {
     if (hcode(g) == 5861) {
-        g->noun = 18;
+        g->noun = NOUN_SWORD;
         do_break(g);
     }
 }
 
 static void do_reflect(Game *g) {
     int h = hcode(g);
-    if ((h == 4864 || h == 4819) && loc[19] == INVENTORY) {
+    if ((h == 4864 || h == 4819) && loc[NOUN_SILVER_PLATE] == INVENTORY) {
         set_response(g, "YOU REFLECTED THE WIZARDS GLARE! HE IS DEAD");
         flagv[FLAGV_WIZARD_DEFEATED] = 1;
     }
-    if (g->noun == 27) do_get(g);
+    if (g->noun == NOUN_STONE_OF_DESTINY) do_get(g);
 }
 
 static void do_with(Game *g) {
     if (hcode(g) == 7549 || hcode(g) == 7649) set_response(g, "WHAT WITH?");
-    if (g->noun == 1 || g->noun == 62) do_give(g);
+    if (g->noun == NOUN_COINS || g->noun == NOUN_COIN) do_give(g);
 }
 
 static void do_unlock(Game *g) {
-    if (hcode(g) == 4870 && loc[21] == INVENTORY) {
+    if (hcode(g) == 4870 && loc[NOUN_KEY] == INVENTORY) {
         set_response(g, "THE KEY TURNS!");
         flagv[FLAGV_WIZARD_DOOR_UNLOCKED] = 1;
     }
@@ -1032,7 +1032,7 @@ static void do_reflect_verb(Game *g) {
 }
 
 static void dispatch(Game *g) {
-    if (g->noun > CARRIED_OBJECTS || g->noun == 0) {
+    if (g->noun > CARRIED_OBJECTS || g->noun == NOUN_NONE) {
     } else if (!(g->verb == 8 || g->verb == 9 || g->verb == 14 || g->verb == 17 || g->verb == 44 || g->verb > 54)) {
         if (g->verb < VERB_COUNT && loc[g->noun] != INVENTORY) {
             snprintf(g->response, sizeof(g->response), "YOU DO NOT HAVE THE %s", g->noun_text);
@@ -1147,7 +1147,7 @@ static void after_turn(Game *g) {
             set_response(g, "YOU SANK!");
         }
     }
-    if (g->room == 56 && flagv[FLAGV_GHOST_FREED] == 0 && loc[10] != INVENTORY) {
+    if (g->room == 56 && flagv[FLAGV_GHOST_FREED] == 0 && loc[NOUN_REEDS] != INVENTORY) {
         set_response(g, "THE GHOST OF THE GOBLIN GUARDIAN GETS YOU!");
         flagv[FLAGV_PLAYER_DEAD] = 1;
     }
