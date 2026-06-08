@@ -1698,8 +1698,8 @@ static void ui_draw(const Game *g, const char *input) {
     }
 
     mvaddnstr(input_top + 1, 2, "WHAT WILL YOU DO NOW? > ", cols - 4);
-    mvaddnstr(input_top + 1, 25, input, cols - 27);
-    move(input_top + 1, 25 + (int)strlen(input));
+    mvaddnstr(input_top + 1, 26, input, cols - 28);
+    move(input_top + 1, 26 + (int)strlen(input));
     refresh();
 }
 
