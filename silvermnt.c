@@ -1843,6 +1843,7 @@ static void ui_execute_command(Game *g, const char *command) {
     snprintf(check, sizeof(check), "%s", command);
     uppercase_trim(check);
     ui_add_command_event(command);
+    set_response(g, "PARDON?");
     if (strcmp(check, "LOOK") == 0 || strcmp(check, "L") == 0) {
         set_response(g, "OK");
         ui_add_event(g->response);
